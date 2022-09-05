@@ -1,14 +1,23 @@
 package ar.edu.itba.pod.models;
 
 public class Ticket {
-    private String flightCode;
-    private String passengerName;
-    private Category category;
+    private final Seat Seat;
+    private final String flightCode;
+    private final String passengerName;
+    private final SeatCategory seatCategory;
 
-    public Ticket(String flightCode, String passengerName, Category category) {
+    public Ticket(String flightCode, String passengerName, SeatCategory seatCategory) {
         this.flightCode = flightCode;
         this.passengerName = passengerName;
-        this.category = category;
+        this.seatCategory = seatCategory;
+        Seat = null;
+    }
+
+    public Ticket(ar.edu.itba.pod.models.Seat seat, String flightCode, String passengerName, SeatCategory seatCategory) {
+        Seat = seat;
+        this.flightCode = flightCode;
+        this.passengerName = passengerName;
+        this.seatCategory = seatCategory;
     }
 
     public String getFlightCode() {
@@ -19,7 +28,7 @@ public class Ticket {
         return passengerName;
     }
 
-    public Category getCategory() {
-        return category;
+    public SeatCategory getCategory() {
+        return seatCategory;
     }
 }

@@ -1,6 +1,6 @@
 package ar.edu.itba.pod.models;
 
-public enum Category {
+public enum SeatCategory {
     ECONOMY,
     BUSINESS,
     FIRST_CLASS
