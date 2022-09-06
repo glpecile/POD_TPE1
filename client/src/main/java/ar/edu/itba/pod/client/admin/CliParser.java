@@ -1,9 +1,11 @@
 package ar.edu.itba.pod.client.admin;
 
+import ar.edu.itba.pod.client.admin.actions.ActionType;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -11,7 +13,7 @@ public class CliParser {
 
     private final Logger logger =LoggerFactory.getLogger(ar.edu.itba.pod.client.Client.class);
     private final CommandLineParser parser = new DefaultParser();
-    private final static Pattern SERVER_ADDRESS_PATTERN = Pattern.compile("\\d\\d(\\.\\d{2}){3}:\\d{4}");
+    private final static Pattern SERVER_ADDRESS_PATTERN = Pattern.compile("^\\d?\\d(?:\\.\\d{1,2}){3}:\\d{1,4}$");
     private final Options options = new Options();
 
 
@@ -46,7 +48,7 @@ public class CliParser {
 
         // Set action
         try {
-            args.setAction(Actions.valueOf(cmd.getOptionValue("Daction").toUpperCase()));
+            args.setAction(ActionType.valueOf(cmd.getOptionValue("Daction").toUpperCase()));
         } catch (IllegalArgumentException e) {
             logger.error("The action is not valid!");
             return Optional.empty();
@@ -54,20 +56,75 @@ public class CliParser {
 
         // Check action and other parameters
 
+        switch (args.getAction()){
+            case MODELS:
+                if (cmd.hasOption("DinPath"))
+                    args.setFilePath(cmd.getOptionValue("DinPath"));
+                else {
+                    logger.error("The input path is required for this action!");
+                    return Optional.empty();
+                }
 
+                break;
+            case FLIGHTS:
+                break;
+            case STATUS:
+                break;
+            case CONFIRM:
+                break;
+            case CANCEL:
+                break;
+            case RETICKETING:
+                break;
+        }
 
-        return Optional.of(args);
+        return args.isValid() ? Optional.of(args) : Optional.empty();
     }
 
-    public class Arguments{
+    public static class Arguments{
+        private Logger logger = LoggerFactory.getLogger(ar.edu.itba.pod.client.admin.CliParser.class);
         private String serverAddress;
-        private Actions action;
+        private ActionType action;
+        private Optional<String> filePath = Optional.empty();
 
-        public Actions getAction() {
+
+        public boolean isValid(){
+            if (filePath.isPresent()) {
+
+                var file = new File(filePath.get());
+
+                if (!file.getName().endsWith(".csv")) {
+                    logger.error("The file is not a csv file!");
+                    return false;
+                }
+
+                if (!file.exists()){
+                    logger.error("The file does not exist!");
+                    return false;
+                }
+
+            }
+
+
+            return true;
+        }
+
+
+
+
+        public Optional<String> getFilePath() {
+            return filePath;
+        }
+
+        public void setFilePath(String filePath) {
+            this.filePath = Optional.of(filePath);
+        }
+
+        public ActionType getAction() {
             return action;
         }
 
-        public void setAction(Actions action) {
+        public void setAction(ActionType action) {
             this.action = action;
         }
 

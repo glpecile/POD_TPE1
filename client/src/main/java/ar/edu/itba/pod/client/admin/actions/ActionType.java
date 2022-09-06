@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.client.admin;
+package ar.edu.itba.pod.client.admin.actions;
 
 /*
     models: Agrega una lote de modelos de aviones (ver detalle más abajo)
@@ -9,7 +9,7 @@ package ar.edu.itba.pod.client.admin;
             reticketing: Fuerza el cambio de tickets de vuelos cancelados por tickets de vuelos alternativos
 */
 
-public enum Actions {
+public enum ActionType {
     MODELS,
     FLIGHTS,
     STATUS,
