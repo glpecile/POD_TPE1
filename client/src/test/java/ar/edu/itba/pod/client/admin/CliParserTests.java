@@ -74,8 +74,8 @@ public class CliParserTests {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "flights","cancel","reticketing",
-            "Flights","Cancel","Reticketing"
+            "flights","reticketing",
+            "Flights","Reticketing"
     })
     public void validAction_ShouldSucceed(String action) {
         // Arrange
@@ -182,6 +182,36 @@ public class CliParserTests {
 
     @Test
     public void parseConfirm_EmptyFlightCode_ShouldFail(){
+        // Arrange
+        var flightCode = "";
+        var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=confirm","-Dflight=" + flightCode};
+
+        // Act
+        var cli = cliParser.parse(args);
+
+        // Assert
+        assertThat(cli.isEmpty()).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"cancel","Cancel"})
+    public void parseCancel_ShouldSucceed(String action){
+        // Arrange
+        var flightCode = "AA123";
+        var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=" + action,"-Dflight=" + flightCode};
+
+        // Act
+        var cli = cliParser.parse(args);
+
+        // Assert
+        assertThat(cli.isPresent()).isTrue();
+        assertThat(cli.get().getAction()).isEqualTo(ActionType.CANCEL);
+        assertThat(cli.get().getFlightCode().isPresent()).isTrue();
+        assertThat(cli.get().getFlightCode().get()).isEqualTo(flightCode);
+    }
+
+    @Test
+    public void parseCancel_EmptyFlightCode_ShouldFail(){
         // Arrange
         var flightCode = "";
         var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=confirm","-Dflight=" + flightCode};

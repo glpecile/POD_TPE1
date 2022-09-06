@@ -68,6 +68,7 @@ public class CliParser {
             case FLIGHTS:
                 break;
             case STATUS:
+            case CANCEL:
             case CONFIRM:
                 if (cmd.hasOption("Dflight"))
                     args.setFlightCode(cmd.getOptionValue("Dflight"));
@@ -75,8 +76,6 @@ public class CliParser {
                     logger.error("The flight code is required for this action!");
                     return Optional.empty();
                 }
-                break;
-            case CANCEL:
                 break;
             case RETICKETING:
                 break;
