@@ -1,5 +1,6 @@
 package ar.edu.itba.pod.client.admin;
 
+import ar.edu.itba.pod.client.admin.actions.ConfirmAction;
 import ar.edu.itba.pod.client.admin.actions.ModelsAction;
 import ar.edu.itba.pod.client.admin.actions.StatusAction;
 import ar.edu.itba.pod.services.AdminService;
@@ -33,6 +34,7 @@ public class Client {
             switch (arguments.getAction()){
                 case MODELS -> new ModelsAction(service,arguments).run();
                 case STATUS -> new StatusAction(service,arguments).run();
+                case CONFIRM -> new ConfirmAction(service,arguments).run();
             }
 
 

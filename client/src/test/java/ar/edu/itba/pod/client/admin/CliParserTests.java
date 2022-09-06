@@ -74,8 +74,8 @@ public class CliParserTests {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "flights","confirm","cancel","reticketing",
-            "Flights","Confirm","Cancel","Reticketing"
+            "flights","cancel","reticketing",
+            "Flights","Cancel","Reticketing"
     })
     public void validAction_ShouldSucceed(String action) {
         // Arrange
@@ -145,6 +145,7 @@ public class CliParserTests {
 
         // Assert
         assertThat(cli.isPresent()).isTrue();
+        assertThat(cli.get().getAction()).isEqualTo(ActionType.STATUS);
         assertThat(cli.get().getFlightCode().isPresent()).isTrue();
         assertThat(cli.get().getFlightCode().get()).isEqualTo(flightCode);
     }
@@ -154,6 +155,36 @@ public class CliParserTests {
         // Arrange
         var flightCode = "";
         var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=status","-Dflight=" + flightCode};
+
+        // Act
+        var cli = cliParser.parse(args);
+
+        // Assert
+        assertThat(cli.isEmpty()).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"confirm","Confirm"})
+    public void parseConfirm_ShouldSucceed(String action){
+        // Arrange
+        var flightCode = "AA123";
+        var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=" + action,"-Dflight=" + flightCode};
+
+        // Act
+        var cli = cliParser.parse(args);
+
+        // Assert
+        assertThat(cli.isPresent()).isTrue();
+        assertThat(cli.get().getAction()).isEqualTo(ActionType.CONFIRM);
+        assertThat(cli.get().getFlightCode().isPresent()).isTrue();
+        assertThat(cli.get().getFlightCode().get()).isEqualTo(flightCode);
+    }
+
+    @Test
+    public void parseConfirm_EmptyFlightCode_ShouldFail(){
+        // Arrange
+        var flightCode = "";
+        var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=confirm","-Dflight=" + flightCode};
 
         // Act
         var cli = cliParser.parse(args);

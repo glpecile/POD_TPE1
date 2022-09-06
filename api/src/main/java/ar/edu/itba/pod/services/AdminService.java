@@ -1,6 +1,5 @@
 package ar.edu.itba.pod.services;
 
-import ar.edu.itba.pod.exceptions.PlaneModelAlreadyExistsException;
 import ar.edu.itba.pod.models.*;
 
 import java.rmi.RemoteException;
@@ -19,7 +18,7 @@ public interface AdminService {
             throws RemoteException;
     void addFlight(String planeModelName, String flightCode, String airportCode, List<Ticket> tickets);
     FlightStatus getFlightStatus(String flightCode) throws RemoteException;
-    void confirmFlight(String flightCode);
+    void confirmFlight(String flightCode) throws RemoteException;
     void cancelFlight(String flightCode);
     void rescheduleTickets();
 }
