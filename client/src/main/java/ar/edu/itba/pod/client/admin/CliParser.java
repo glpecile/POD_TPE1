@@ -64,11 +64,16 @@ public class CliParser {
                     logger.error("The input path is required for this action!");
                     return Optional.empty();
                 }
-
                 break;
             case FLIGHTS:
                 break;
             case STATUS:
+                if (cmd.hasOption("Dflight"))
+                    args.setFlightCode(cmd.getOptionValue("Dflight"));
+                else {
+                    logger.error("The flight code is required for this action!");
+                    return Optional.empty();
+                }
                 break;
             case CONFIRM:
                 break;
@@ -86,6 +91,7 @@ public class CliParser {
         private String serverAddress;
         private ActionType action;
         private Optional<String> filePath = Optional.empty();
+        private Optional<String> flightCode = Optional.empty();
 
 
         public boolean isValid(){
@@ -102,9 +108,12 @@ public class CliParser {
                     logger.error("The file does not exist!");
                     return false;
                 }
-
             }
 
+            if (flightCode.isPresent() && flightCode.get().isEmpty()){
+                logger.error("The flight code is not valid!");
+                return false;
+            }
 
             return true;
         }
@@ -134,6 +143,14 @@ public class CliParser {
 
         public void setServerAddress(String serverAddress) {
             this.serverAddress = serverAddress;
+        }
+
+        public Optional<String> getFlightCode() {
+            return flightCode;
+        }
+
+        public void setFlightCode(String flightCode) {
+            this.flightCode = Optional.ofNullable(flightCode);
         }
     }
 

@@ -1,6 +1,7 @@
 package ar.edu.itba.pod.client.admin;
 
 import ar.edu.itba.pod.client.admin.actions.ModelsAction;
+import ar.edu.itba.pod.client.admin.actions.StatusAction;
 import ar.edu.itba.pod.services.AdminService;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ public class Client {
 
             switch (arguments.getAction()){
                 case MODELS -> new ModelsAction(service,arguments).run();
+                case STATUS -> new StatusAction(service,arguments).run();
             }
 
 

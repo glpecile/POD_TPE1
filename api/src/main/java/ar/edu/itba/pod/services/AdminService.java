@@ -18,7 +18,7 @@ public interface AdminService {
     void addPlane(String planeModelName, Map<SeatCategory, Pair<Integer, Integer> > seatsPerCategory)
             throws RemoteException;
     void addFlight(String planeModelName, String flightCode, String airportCode, List<Ticket> tickets);
-    FlightStatus getFlightStatus(String flightCode);
+    FlightStatus getFlightStatus(String flightCode) throws RemoteException;
     void confirmFlight(String flightCode);
     void cancelFlight(String flightCode);
     void rescheduleTickets();

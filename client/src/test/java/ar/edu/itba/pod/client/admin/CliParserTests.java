@@ -74,8 +74,8 @@ public class CliParserTests {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "flights","status","confirm","cancel","reticketing",
-            "Flights","Status","Confirm","Cancel","Reticketing"
+            "flights","confirm","cancel","reticketing",
+            "Flights","Confirm","Cancel","Reticketing"
     })
     public void validAction_ShouldSucceed(String action) {
         // Arrange
@@ -125,6 +125,35 @@ public class CliParserTests {
         // Arrange
         var file = "../../file.csv";
         var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=models","-DinPath=" + file};
+
+        // Act
+        var cli = cliParser.parse(args);
+
+        // Assert
+        assertThat(cli.isEmpty()).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"status","Status"})
+    public void parseStatus_ShouldSucceed(String action){
+        // Arrange
+        var flightCode = "AA123";
+        var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=" + action,"-Dflight=" + flightCode};
+
+        // Act
+        var cli = cliParser.parse(args);
+
+        // Assert
+        assertThat(cli.isPresent()).isTrue();
+        assertThat(cli.get().getFlightCode().isPresent()).isTrue();
+        assertThat(cli.get().getFlightCode().get()).isEqualTo(flightCode);
+    }
+
+    @Test
+    public void parseStatus_EmptyFlightCode_ShouldFail(){
+        // Arrange
+        var flightCode = "";
+        var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=status","-Dflight=" + flightCode};
 
         // Act
         var cli = cliParser.parse(args);
