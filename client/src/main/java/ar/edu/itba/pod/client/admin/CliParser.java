@@ -58,14 +58,13 @@ public class CliParser {
 
         switch (args.getAction()){
             case MODELS:
+            case FLIGHTS:
                 if (cmd.hasOption("DinPath"))
                     args.setFilePath(cmd.getOptionValue("DinPath"));
                 else {
                     logger.error("The input path is required for this action!");
                     return Optional.empty();
                 }
-                break;
-            case FLIGHTS:
                 break;
             case STATUS:
             case CANCEL:
@@ -85,7 +84,7 @@ public class CliParser {
     }
 
     public static class Arguments{
-        private Logger logger = LoggerFactory.getLogger(ar.edu.itba.pod.client.admin.CliParser.class);
+        private final Logger logger = LoggerFactory.getLogger(ar.edu.itba.pod.client.admin.CliParser.class);
         private String serverAddress;
         private ActionType action;
         private Optional<String> filePath = Optional.empty();

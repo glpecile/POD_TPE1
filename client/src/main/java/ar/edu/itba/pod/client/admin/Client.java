@@ -1,9 +1,6 @@
 package ar.edu.itba.pod.client.admin;
 
-import ar.edu.itba.pod.client.admin.actions.CancelAction;
-import ar.edu.itba.pod.client.admin.actions.ConfirmAction;
-import ar.edu.itba.pod.client.admin.actions.ModelsAction;
-import ar.edu.itba.pod.client.admin.actions.StatusAction;
+import ar.edu.itba.pod.client.admin.actions.*;
 import ar.edu.itba.pod.services.AdminService;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -37,6 +34,7 @@ public class Client {
                 case STATUS -> new StatusAction(service,arguments).run();
                 case CONFIRM -> new ConfirmAction(service,arguments).run();
                 case CANCEL -> new CancelAction(service,arguments).run();
+                case FLIGHTS -> new FlightsAction(service,arguments).run();
             }
 
 

@@ -38,7 +38,7 @@ public class CliParserTests {
     @ValueSource(strings = {"10.23.34.55:9999","1.2.3.5:9999", "10.23.34.55:999", "10.23.34.55:99", "10.23.34.55:9"})
     public void validServerAddress_ShouldSucceed(String serverAddress){
         // Arrange
-        var args = new String[]{"-DserverAddress=" + serverAddress, "-Daction=flights"};
+        var args = new String[]{"-DserverAddress=" + serverAddress, "-Daction=confirm", "-Dflight=AA123"};
 
         // Act
         var cli = cliParser.parse(args);
@@ -74,8 +74,7 @@ public class CliParserTests {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "flights","reticketing",
-            "Flights","Reticketing"
+            "reticketing", "Reticketing"
     })
     public void validAction_ShouldSucceed(String action) {
         // Arrange
@@ -215,6 +214,50 @@ public class CliParserTests {
         // Arrange
         var flightCode = "";
         var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=confirm","-Dflight=" + flightCode};
+
+        // Act
+        var cli = cliParser.parse(args);
+
+        // Assert
+        assertThat(cli.isEmpty()).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Flights","flights"})
+    public void parseFlights_ShouldSucceed(String action){
+        // Arrange
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        var file = Objects.requireNonNull(classloader.getResource("test.csv")).getPath();
+        var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=" + action,"-DinPath=" + file};
+
+        // Act
+        var cli = cliParser.parse(args);
+
+        // Assert
+        assertThat(cli.isPresent()).isTrue();
+        assertThat(cli.get().getAction()).isEqualTo(ActionType.FLIGHTS);
+        assertThat(cli.get().getFilePath().isPresent()).isTrue();
+        assertThat(cli.get().getFilePath().get()).isEqualTo(file);
+    }
+
+    @Test
+    public void parseFlights_InvalidExtension_ShouldFail(){
+        // Arrange
+        var file = "../../file.exe";
+        var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=flights","-DinPath=" + file};
+
+        // Act
+        var cli = cliParser.parse(args);
+
+        // Assert
+        assertThat(cli.isEmpty()).isTrue();
+    }
+
+    @Test
+    public void parseFlights_FileDoesNotExist_ShouldFail(){
+        // Arrange
+        var file = "../../file.csv";
+        var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=flights","-DinPath=" + file};
 
         // Act
         var cli = cliParser.parse(args);
