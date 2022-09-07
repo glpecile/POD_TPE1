@@ -9,4 +9,12 @@
   <artifactId>tpe1-g3-parent-api</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>tpe1-g3-parent-api</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 </project>

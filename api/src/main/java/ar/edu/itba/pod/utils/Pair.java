@@ -1,20 +1,16 @@
 package ar.edu.itba.pod.utils;
 
 
+import lombok.Getter;
+
 public class Pair<T, U> {
+    @Getter
     private final T first;
+    @Getter
     private final U second;
 
     public Pair(T first, U second) {
         this.first = first;
         this.second = second;
-    }
-
-    public T getFirst() {
-        return first;
-    }
-
-    public U getSecond() {
-        return second;
     }
 }

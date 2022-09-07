@@ -69,7 +69,7 @@ public class FlightsAction {
 
             for (var ticket: tickets.split(",")) {
                 var data = ticket.split("#");
-                Tickets.add(new Ticket(flightCode,data[1], SeatCategory.valueOf(data[0])));
+                Tickets.add(new Ticket(data[1], SeatCategory.valueOf(data[0])));
             }
         }
 
