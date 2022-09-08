@@ -3,6 +3,7 @@ package ar.edu.itba.pod.models;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class Ticket {
@@ -32,6 +33,18 @@ public class Ticket {
             this.row = row;
             this.column = column;
         }
-    }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SeatLocation that = (SeatLocation) o;
+            return row == that.row && column == that.column;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(row, column);
+        }
+    }
 }

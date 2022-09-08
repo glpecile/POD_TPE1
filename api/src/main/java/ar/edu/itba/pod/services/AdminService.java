@@ -23,5 +23,4 @@ public interface AdminService extends Remote {
     void cancelFlight(String flightCode) throws RemoteException;
 
     ReticketingReport rescheduleTickets() throws RemoteException;
-
 }
