@@ -38,7 +38,7 @@ public class PlaneTest {
         seatsPerCategory.put(SeatCategory.PREMIUM_ECONOMY, new Pair<>(10, 4));
         seatsPerCategory.put(SeatCategory.BUSINESS, new Pair<>(4, 4));
 
-        assertThrows(IllegalArgumentException.class, () -> new Plane("Boeing 747", seatsPerCategory));
+        assertThrows(EmptySeatDistributionException.class, () -> new Plane("Boeing 747", seatsPerCategory));
     }
 
     @Test
@@ -48,6 +48,6 @@ public class PlaneTest {
         seatsPerCategory.put(SeatCategory.PREMIUM_ECONOMY, new Pair<>(10, 4));
         seatsPerCategory.put(SeatCategory.BUSINESS, new Pair<>(4, 4));
 
-        assertThrows(IllegalArgumentException.class, () -> new Plane("Boeing 747", seatsPerCategory));
+        assertThrows(EmptySeatDistributionException.class, () -> new Plane("Boeing 747", seatsPerCategory));
     }
 }

@@ -1,7 +1,10 @@
 package ar.edu.itba.pod.services;
 
+import ar.edu.itba.pod.exceptions.FlightCodeAlreadyExistsException;
 import ar.edu.itba.pod.exceptions.PlaneModelAlreadyExistsException;
+import ar.edu.itba.pod.exceptions.PlaneModelNotExistException;
 import ar.edu.itba.pod.models.Flight;
+import ar.edu.itba.pod.models.FlightStatus;
 import ar.edu.itba.pod.models.Plane;
 import ar.edu.itba.pod.models.SeatCategory;
 import ar.edu.itba.pod.server.services.AdminServiceImpl;
@@ -36,6 +39,11 @@ public class AdminServiceImplTest {
         seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(2, 2));
         Plane plane = new Plane(planeModelName, seatsPerCategory);
         this.planes.add(plane);
+
+        String flightCode = "AR1235";
+        String airportCode = "EZE";
+        Flight flight = new Flight(FlightStatus.SCHEDULED, airportCode, flightCode, plane, new ArrayList<>());
+        this.flights.add(flight);
     }
 
     @Test
@@ -62,5 +70,36 @@ public class AdminServiceImplTest {
 
         assertThrows(PlaneModelAlreadyExistsException.class, () -> adminService.addPlane(planeModelName, seatsPerCategory));
     }
+
+    @Test
+    public void addFlightTest() throws RemoteException {
+        String planeModelName = "Boeing 787";
+        String flightCode = "AR1234";
+        String airportCode = "EZE";
+
+        adminService.addFlight(planeModelName, flightCode, airportCode, new ArrayList<>());
+
+        assertEquals(flights.size(), 2);
+        assertEquals(flights.get(1).getFlightCode(), flightCode);
+    }
+
+    @Test
+    public void addFlightWithNoPlaneTest() throws RemoteException {
+        String planeModelName = "Boeing 747";
+        String flightCode = "AR1234";
+        String airportCode = "EZE";
+
+        assertThrows(PlaneModelNotExistException.class, () -> adminService.addFlight(planeModelName, flightCode, airportCode, new ArrayList<>()));
+    }
+
+    @Test
+    public void flightCodeAlreadyExistsTest() throws RemoteException {
+        String planeModelName = "Boeing 787";
+        String flightCode = "AR1235";
+        String airportCode = "EZE";
+
+        assertThrows(FlightCodeAlreadyExistsException.class, () -> adminService.addFlight(planeModelName, flightCode, airportCode, new ArrayList<>()));
+    }
+
 
 }
