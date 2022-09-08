@@ -42,6 +42,7 @@ public class AdminServiceImplTest {
         String airportCode = "EZE";
         Flight flight = new Flight(FlightStatus.SCHEDULED, airportCode, flightCode, plane, new ArrayList<>());
         this.flights.add(flight);
+
     }
 
     @Test
