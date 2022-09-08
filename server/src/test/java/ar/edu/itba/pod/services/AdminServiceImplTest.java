@@ -131,4 +131,22 @@ public class AdminServiceImplTest {
         assertThrows(FlightStatusNotPendingException.class, () -> adminService.confirmFlight(flightCode));
     }
 
+    @Test
+    public void cancelFlightTest() throws RemoteException {
+        String flightCode = "AR1235";
+
+        adminService.cancelFlight(flightCode);
+
+        assertEquals(adminService.getFlightStatus(flightCode), FlightStatus.CANCELLED);
+    }
+
+    @Test
+    public void cancelFlightWithNoFlightTest() {
+        String flightCode = "AR1236";
+        Flight cancelledFlight = new Flight(FlightStatus.CANCELLED, "EZE", flightCode, planes.get(0), new ArrayList<>());
+        flights.add(cancelledFlight);
+
+        assertThrows(FlightStatusNotPendingException.class, () -> adminService.cancelFlight(flightCode));
+    }
+
 }

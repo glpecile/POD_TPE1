@@ -52,7 +52,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void cancelFlight(String flightCode) throws RemoteException {
-
+        setFlightStatus(flightCode, FlightStatus.CANCELLED);
     }
 
     private void setFlightStatus(String flightCode, FlightStatus status) {
