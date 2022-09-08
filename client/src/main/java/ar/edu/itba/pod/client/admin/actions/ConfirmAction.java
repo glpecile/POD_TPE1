@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 
-public class ConfirmAction {
+public class ConfirmAction implements Runnable {
 
     private final AdminService service;
     private final CliParser.Arguments arguments;

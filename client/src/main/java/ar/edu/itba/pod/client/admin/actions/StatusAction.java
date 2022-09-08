@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 
-public class StatusAction {
+public class StatusAction implements Runnable {
     private final AdminService service;
     private final CliParser.Arguments arguments;
     private final Logger logger;

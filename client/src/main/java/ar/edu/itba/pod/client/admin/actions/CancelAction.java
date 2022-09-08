@@ -5,7 +5,7 @@ import ar.edu.itba.pod.services.AdminService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CancelAction {
+public class CancelAction implements Runnable {
     private final AdminService service;
     private final CliParser.Arguments arguments;
     private final Logger logger;

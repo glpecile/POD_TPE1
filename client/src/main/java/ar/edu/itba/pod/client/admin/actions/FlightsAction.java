@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FlightsAction {
+public class FlightsAction implements Runnable {
     private final AdminService service;
     private final CliParser.Arguments arguments;
     private final Logger logger;
@@ -32,13 +32,19 @@ public class FlightsAction {
     }
 
 
-    public void run() throws IOException {
-        var flights = Files
-                .readAllLines(Paths.get(arguments.getFilePath().get()))
-                .stream().skip(1)
-                .map(t-> t.split(";"))
-                .map(t-> new FlightModel(t[0], t[1],t[2],t[3]))
-                .collect(Collectors.toList());
+    public void run() {
+        List<FlightModel> flights;
+        try {
+            flights = Files
+                    .readAllLines(Paths.get(arguments.getFilePath().get()))
+                    .stream().skip(1)
+                    .map(t -> t.split(";"))
+                    .map(t -> new FlightModel(t[0], t[1], t[2], t[3]))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            logger.error("Error reading file {}", arguments.getFilePath().get());
+            return;
+        }
 
         int flightsAdded = 0;
         for (var flight : flights) {

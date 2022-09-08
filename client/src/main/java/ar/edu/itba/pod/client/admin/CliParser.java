@@ -1,6 +1,8 @@
 package ar.edu.itba.pod.client.admin;
 
 import ar.edu.itba.pod.client.admin.actions.ActionType;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,14 +87,20 @@ public class CliParser {
 
     public static class Arguments{
         private final Logger logger = LoggerFactory.getLogger(ar.edu.itba.pod.client.admin.CliParser.class);
+        @Getter
+        @Setter
         private String serverAddress;
+        @Getter
+        @Setter
         private ActionType action;
-        private Optional<String> filePath = Optional.empty();
-        private Optional<String> flightCode = Optional.empty();
-
+        @Setter
+        private String filePath = null;
+        @Setter
+        private String flightCode = null;
 
         public boolean isValid(){
-            if (filePath.isPresent()) {
+            var filePath = getFilePath();
+            if (filePath.isPresent()){
 
                 var file = new File(filePath.get());
 
@@ -107,6 +115,8 @@ public class CliParser {
                 }
             }
 
+            var flightCode = getFlightCode();
+
             if (flightCode.isPresent() && flightCode.get().isEmpty()){
                 logger.error("The flight code is not valid!");
                 return false;
@@ -115,39 +125,12 @@ public class CliParser {
             return true;
         }
 
-
-
-
         public Optional<String> getFilePath() {
-            return filePath;
-        }
-
-        public void setFilePath(String filePath) {
-            this.filePath = Optional.of(filePath);
-        }
-
-        public ActionType getAction() {
-            return action;
-        }
-
-        public void setAction(ActionType action) {
-            this.action = action;
-        }
-
-        public String getServerAddress() {
-            return serverAddress;
-        }
-
-        public void setServerAddress(String serverAddress) {
-            this.serverAddress = serverAddress;
+            return Optional.ofNullable(filePath);
         }
 
         public Optional<String> getFlightCode() {
-            return flightCode;
-        }
-
-        public void setFlightCode(String flightCode) {
-            this.flightCode = Optional.ofNullable(flightCode);
+            return Optional.ofNullable(flightCode);
         }
     }
 
