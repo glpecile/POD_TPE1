@@ -3,7 +3,9 @@ package ar.edu.itba.pod.utils;
 
 import lombok.Getter;
 
-public class Pair<T, U> {
+import java.io.Serializable;
+
+public class Pair<T, U>  implements Serializable {
     @Getter
     private final T first;
     @Getter

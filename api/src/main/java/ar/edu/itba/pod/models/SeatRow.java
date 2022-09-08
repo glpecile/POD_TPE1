@@ -2,7 +2,9 @@ package ar.edu.itba.pod.models;
 
 import lombok.Getter;
 
-public class SeatRow {
+import java.io.Serializable;
+
+public class SeatRow implements Serializable {
     @Getter
     private final int row;
     @Getter

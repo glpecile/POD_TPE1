@@ -3,9 +3,10 @@ package ar.edu.itba.pod.models;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Flight {
+public class Flight implements Serializable {
     @Getter @Setter
     private FlightStatus status;
     @Getter

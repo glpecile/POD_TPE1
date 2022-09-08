@@ -4,12 +4,13 @@ import ar.edu.itba.pod.exceptions.EmptySeatDistributionException;
 import ar.edu.itba.pod.utils.Pair;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class Plane {
+public class Plane implements Serializable {
     @Getter
     private final String modelName;
     @Getter

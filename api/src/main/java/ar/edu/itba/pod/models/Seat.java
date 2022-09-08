@@ -2,7 +2,9 @@ package ar.edu.itba.pod.models;
 
 import lombok.Getter;
 
-public class Seat {
+import java.io.Serializable;
+
+public class Seat implements Serializable {
     @Getter
     private final String passenger;
     @Getter

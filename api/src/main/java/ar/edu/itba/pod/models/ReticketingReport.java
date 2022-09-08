@@ -3,10 +3,11 @@ package ar.edu.itba.pod.models;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReticketingReport {
+public class ReticketingReport implements Serializable {
     @Getter
     private final int success;
     @Getter

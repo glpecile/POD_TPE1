@@ -2,7 +2,6 @@ package ar.edu.itba.pod.client.admin;
 
 import ar.edu.itba.pod.client.admin.actions.*;
 import ar.edu.itba.pod.services.AdminService;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,7 @@ public class Client {
 
         try
         {
-            final Registry registry = LocateRegistry.getRegistry(arguments.getServerAddress());
+            final Registry registry = LocateRegistry.getRegistry(arguments.getHost(),arguments.getPort());
             final AdminService service = (AdminService) registry.lookup("AdminService");
 
             switch (arguments.getAction()){
