@@ -17,7 +17,26 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
 
     @Override
     public Boolean isSeatTaken(String flightCode, int row, char column) {
-        return null;
+        if(row <= 0 || !Character.isLetter(column))
+            throw new SeatDoesNotExistException();
+
+        if(flightCode.isEmpty())
+            throw new FlightDoesNotExistException();
+
+        Flight flight = flightList.stream()
+                .filter(f -> f.getFlightCode().equals(flightCode))
+                .findFirst().orElseThrow(FlightDoesNotExistException::new);
+
+        Plane plane = flight.getPlane();
+        if( ((long) plane.getRows().size() < row) || (plane.getRows().get(row-1).getColumns() < (column-'a' + 1)) )
+            throw new SeatDoesNotExistException();
+
+        Ticket.SeatLocation seatLocation = new Ticket.SeatLocation(row, column);
+        Optional<Ticket> ticketOnLocation = flight.getTickets().stream()
+                .filter(t -> t.getSeatLocation().isPresent() && t.getSeatLocation().get().equals(seatLocation))
+                .findAny();
+
+        return ticketOnLocation.isPresent();
     }
     @Override
     public void assignSeat(String flightCode, String passenger, int row, char column) throws Exception {
@@ -46,6 +65,7 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
 
         if(ticket.getSeatLocation().isPresent())
             throw new PassengerAlreadyAssignedException();
+
         Ticket.SeatLocation seatLocation = new Ticket.SeatLocation(row, column);
         Optional<Ticket> ticketOnLocation = flight.getTickets().stream()
                 .filter(t -> t.getSeatLocation().isPresent() && t.getSeatLocation().get().equals(seatLocation))

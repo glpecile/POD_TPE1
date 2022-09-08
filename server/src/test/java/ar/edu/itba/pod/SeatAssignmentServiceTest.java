@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SeatAssignmentServiceTest {
     SeatAssignmentService seatAssignmentService;
@@ -377,7 +376,237 @@ public class SeatAssignmentServiceTest {
             assertEquals("SeatDoesNotExistException", e.getMessage());
         }
     }
+    @Test
+    public void isSeatTaken_WithSmallRow_ShouldThrowSeatDoesNotExistException(){
 
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            seatAssignmentService.isSeatTaken("FC1234",  0, 'a');
+
+//            Assert
+            fail();
+        }catch (Exception e) {
+            assertEquals("SeatDoesNotExistException", e.getMessage());
+        }
+    }
+
+    @Test
+    public void isSeatTaken_WithBigRow_ShouldThrowSeatDoesNotExistException(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            seatAssignmentService.isSeatTaken("FC1234",  6, 'a');
+
+//            Assert
+            fail();
+        }catch (Exception e) {
+            assertEquals("SeatDoesNotExistException", e.getMessage());
+        }
+    }
+
+    @Test
+    public void isSeatTaken_WithInvalidColumn_ShouldThrowSeatDoesNotExistException(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            seatAssignmentService.isSeatTaken("FC1234",  4, '0');
+
+//            Assert
+            fail();
+        }catch (Exception e) {
+            assertEquals("SeatDoesNotExistException", e.getMessage());
+        }
+    }
+    @Test
+    public void isSeatTaken_WithBigColumn_ShouldThrowSeatDoesNotExistException(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            seatAssignmentService.isSeatTaken("FC1234",  4, 'c');
+
+//            Assert
+            fail();
+        }catch (Exception e) {
+            assertEquals("SeatDoesNotExistException", e.getMessage());
+        }
+    }
+
+    @Test
+    public void isSeatTaken_WithEmptyFlightCode_ShouldThrowFlightDoesNotExistException(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            seatAssignmentService.isSeatTaken("",  4, 'b');
+
+//            Assert
+            fail();
+        }catch (Exception e) {
+            assertEquals("FlightDoesNotExistException", e.getMessage());
+        }
+    }
+    @Test
+    public void isSeatTaken_WithNonExistentFlightCode_ShouldThrowFlightDoesNotExistException(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            seatAssignmentService.isSeatTaken("FC-different",  4, 'b');
+
+//            Assert
+            fail();
+        }catch (Exception e) {
+            assertEquals("FlightDoesNotExistException", e.getMessage());
+        }
+    }
+    @Test
+    public void isSeatTaken_ShouldReturnFalse(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            boolean isSeatTaken = seatAssignmentService.isSeatTaken("FC1234",  4, 'b');
+
+//            Assert
+            assertFalse(isSeatTaken);
+        }catch (Exception e) {
+            fail();
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Test
+    public void isSeatTaken_ShouldReturnTrue(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        ticket.setSeatLocation(new Ticket.SeatLocation(4, 'b'));
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            boolean isSeatTaken = seatAssignmentService.isSeatTaken("FC1234",  4, 'b');
+
+//            Assert
+            assertTrue(isSeatTaken);
+        }catch (Exception e) {
+            fail();
+            System.out.println(e.getMessage());
+        }
+    }
 
 
 }
