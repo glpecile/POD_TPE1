@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SeatAssignmentServiceTest {
     SeatAssignmentService seatAssignmentService;
+
     @Test
     public void AssignSeat_WithWeirdFlighCode_ShouldThrowFlightDoesNotExist(){
 
@@ -608,5 +609,129 @@ public class SeatAssignmentServiceTest {
         }
     }
 
+    @Test
+    public void changeSeat_WithBigRow_ShouldThrowSeatDoesNotExistException(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        ticket.setSeatLocation(new Ticket.SeatLocation(4, 'b'));
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            seatAssignmentService.changeSeat("FC1234", "test-name" ,5, 'b');
+
+//            Assert
+            fail();
+        }catch (Exception e) {
+            assertEquals("SeatDoesNotExistException", e.getMessage());
+        }
+    }
+    @Test
+    public void changeSeat_WithSameLocation_ShouldSucceed(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        ticket.setSeatLocation(new Ticket.SeatLocation(4, 'b'));
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            seatAssignmentService.changeSeat("FC1234", "test-name" ,4, 'b');
+
+//            Assert
+
+        }catch (Exception e) {
+            fail();
+
+        }
+    }
+    @Test
+    public void changeSeat_WithNotTakenSeat_ShouldSucceed(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        ticket.setSeatLocation(new Ticket.SeatLocation(4, 'b'));
+        tickets.add(ticket);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            seatAssignmentService.changeSeat("FC1234", "test-name" ,3, 'b');
+
+//            Assert
+
+        }catch (Exception e) {
+            fail();
+
+        }
+    }
+    @Test
+    public void changeSeat_WithTakenSeat_ShouldThrowSeatAlreadyAssignedException(){
+
+//        Arrange
+        List<Ticket> tickets =new ArrayList<>();
+        Ticket ticket = new Ticket("test-name", SeatCategory.ECONOMY);
+        ticket.setSeatLocation(new Ticket.SeatLocation(4, 'b'));
+        Ticket ticket2 = new Ticket("test-name2", SeatCategory.ECONOMY);
+        ticket2.setSeatLocation(new Ticket.SeatLocation(3, 'b'));
+        tickets.add(ticket);
+        tickets.add(ticket2);
+
+        TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();
+        seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(4, 2));
+
+        Plane plane = new Plane("test-model" ,seatsPerCategory);
+
+        List<Flight> flights = new ArrayList<>();
+        Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
+        flights.add(flight);
+        seatAssignmentService = new SeatAssignmentService(flights);
+
+//        Act
+        try {
+            seatAssignmentService.changeSeat("FC1234", "test-name" ,3, 'b');
+//            Assert
+            fail();
+        }catch (Exception e) {
+
+            assertEquals("SeatAlreadyAssignedException", e.getMessage());
+
+        }
+    }
+
+   
 
 }
