@@ -1,9 +1,6 @@
 package ar.edu.itba.pod.services;
 
-import ar.edu.itba.pod.exceptions.FlightCodeAlreadyExistsException;
-import ar.edu.itba.pod.exceptions.FlightCodeNotExistException;
-import ar.edu.itba.pod.exceptions.PlaneModelAlreadyExistsException;
-import ar.edu.itba.pod.exceptions.PlaneModelNotExistException;
+import ar.edu.itba.pod.exceptions.*;
 import ar.edu.itba.pod.models.Flight;
 import ar.edu.itba.pod.models.FlightStatus;
 import ar.edu.itba.pod.models.Plane;
@@ -114,6 +111,24 @@ public class AdminServiceImplTest {
         String flightCode = "AR1234";
 
         assertThrows(FlightCodeNotExistException.class, () -> adminService.getFlightStatus(flightCode));
+    }
+
+    @Test
+    public void confirmFlightTest() throws RemoteException {
+        String flightCode = "AR1235";
+
+        adminService.confirmFlight(flightCode);
+
+        assertEquals(adminService.getFlightStatus(flightCode), FlightStatus.CONFIRMED);
+    }
+
+    @Test
+    public void confirmFlightWithNoFlightTest() {
+        String flightCode = "AR1236";
+        Flight confirmedFlight = new Flight(FlightStatus.CONFIRMED, "EZE", flightCode, planes.get(0), new ArrayList<>());
+        flights.add(confirmedFlight);
+
+        assertThrows(FlightStatusNotPendingException.class, () -> adminService.confirmFlight(flightCode));
     }
 
 }

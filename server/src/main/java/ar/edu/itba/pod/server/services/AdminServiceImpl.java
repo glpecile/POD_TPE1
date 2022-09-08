@@ -1,9 +1,6 @@
 package ar.edu.itba.pod.server.services;
 
-import ar.edu.itba.pod.exceptions.FlightCodeAlreadyExistsException;
-import ar.edu.itba.pod.exceptions.FlightCodeNotExistException;
-import ar.edu.itba.pod.exceptions.PlaneModelAlreadyExistsException;
-import ar.edu.itba.pod.exceptions.PlaneModelNotExistException;
+import ar.edu.itba.pod.exceptions.*;
 import ar.edu.itba.pod.models.*;
 import ar.edu.itba.pod.services.AdminService;
 import ar.edu.itba.pod.utils.Pair;
@@ -50,12 +47,20 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void confirmFlight(String flightCode) throws RemoteException {
-
+        setFlightStatus(flightCode, FlightStatus.CONFIRMED);
     }
 
     @Override
     public void cancelFlight(String flightCode) throws RemoteException {
 
+    }
+
+    private void setFlightStatus(String flightCode, FlightStatus status) {
+        Flight flight = this.flights.stream().filter(f -> f.getFlightCode().equals(flightCode)).findFirst().orElseThrow(FlightCodeNotExistException::new);
+        if(!flight.getStatus().equals(FlightStatus.SCHEDULED)) {
+            throw new FlightStatusNotPendingException();
+        }
+        flight.setStatus(status);
     }
 
     @Override
