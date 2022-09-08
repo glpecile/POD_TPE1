@@ -24,6 +24,7 @@ public class StatusAction implements Runnable {
         this.logger = logger;
     }
 
+    @Override
     public void run() {
         var flightCode = arguments.getFlightCode().get();
 

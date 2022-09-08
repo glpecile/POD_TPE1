@@ -32,9 +32,8 @@ public class ModelsAction implements Runnable {
         this.logger = logger;
     }
 
+    @Override
     public void run() {
-
-
         List<PlaneModel> planeModels;
         try {
             planeModels = Files

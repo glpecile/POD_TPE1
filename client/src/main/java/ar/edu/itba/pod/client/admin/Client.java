@@ -35,6 +35,7 @@ public class Client {
                 case CONFIRM -> new ConfirmAction(service,arguments).run();
                 case CANCEL -> new CancelAction(service,arguments).run();
                 case FLIGHTS -> new FlightsAction(service,arguments).run();
+                case RETICKETING -> new ReticketingAction(service,arguments).run();
             }
 
 

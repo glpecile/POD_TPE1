@@ -31,7 +31,7 @@ public class FlightsAction implements Runnable {
         this.logger = logger;
     }
 
-
+    @Override
     public void run() {
         List<FlightModel> flights;
         try {

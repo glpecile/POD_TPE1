@@ -22,6 +22,7 @@ public class CancelAction implements Runnable {
         this.logger = logger;
     }
 
+    @Override
     public void run() {
         var flightCode = arguments.getFlightCode().get();
 

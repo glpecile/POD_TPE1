@@ -76,7 +76,7 @@ public class CliParserTests {
     @ValueSource(strings = {
             "reticketing", "Reticketing"
     })
-    public void validAction_ShouldSucceed(String action) {
+    public void parseReticketing_ShouldSucceed(String action) {
         // Arrange
         var args = new String[]{"-DserverAddress=10.23.34.55:9999", "-Daction=" + action};
 
@@ -85,7 +85,7 @@ public class CliParserTests {
 
         // Assert
         assertThat(cli.isPresent()).isTrue();
-        assertThat(cli.get().getAction()).isEqualTo(ActionType.valueOf(action.toUpperCase()));
+        assertThat(cli.get().getAction()).isEqualTo(ActionType.RETICKETING);
     }
 
     @ParameterizedTest
