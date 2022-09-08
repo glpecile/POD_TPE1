@@ -27,7 +27,7 @@ public class Client {
         try
         {
             final Registry registry = LocateRegistry.getRegistry(arguments.getServerAddress());
-            final AdminService service = (AdminService) registry.lookup(AdminService.getServiceName());
+            final AdminService service = (AdminService) registry.lookup("AdminService");
 
             switch (arguments.getAction()){
                 case MODELS -> new ModelsAction(service,arguments).run();
