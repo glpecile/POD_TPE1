@@ -1,6 +1,7 @@
 package ar.edu.itba.pod.client.admin;
 
 import ar.edu.itba.pod.client.admin.actions.ActionType;
+import ar.edu.itba.pod.client.models.Arguments;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.cli.*;
@@ -13,10 +14,9 @@ import java.util.regex.Pattern;
 
 public class CliParser {
 
-    private final Logger logger =LoggerFactory.getLogger(ar.edu.itba.pod.client.Client.class);
+    private final Logger logger = LoggerFactory.getLogger(ar.edu.itba.pod.client.admin.Client.class);
     private final CommandLineParser parser = new DefaultParser();
-    private final static Pattern SERVER_ADDRESS_PATTERN = Pattern.
-            compile("^(?<host>localhost|\\d?\\d?\\d(?:\\.\\d{1,3}){3}):(?<port>\\d{1,4})$");
+
     private final Options options = new Options();
 
 
@@ -41,13 +41,7 @@ public class CliParser {
         var args = new Arguments();
 
         // Set server address
-        var serverAddress = cmd.getOptionValue("DserverAddress");
-        if (SERVER_ADDRESS_PATTERN.matcher(serverAddress).matches())
-            args.setServerAddress(serverAddress);
-        else {
-            logger.error("The server address is not valid!");
-            return Optional.empty();
-        }
+        args.setServerAddress(cmd.getOptionValue("DserverAddress"));
 
         // Set action
         try {
@@ -58,7 +52,6 @@ public class CliParser {
         }
 
         // Check action and other parameters
-
         switch (args.getAction()){
             case MODELS:
             case FLIGHTS:
@@ -86,14 +79,7 @@ public class CliParser {
         return args.isValid() ? Optional.of(args) : Optional.empty();
     }
 
-    public static class Arguments{
-        private final Logger logger = LoggerFactory.getLogger(ar.edu.itba.pod.client.admin.CliParser.class);
-        @Getter
-        @Setter
-        private String host;
-        @Getter
-        @Setter
-        private int port;
+    public static class Arguments extends ar.edu.itba.pod.client.models.Arguments {
 
         @Getter
         @Setter
@@ -103,7 +89,11 @@ public class CliParser {
         @Setter
         private String flightCode = null;
 
+        @Override
         public boolean isValid(){
+            if (!super.isValid())
+                return false;
+
             var filePath = getFilePath();
             if (filePath.isPresent()){
 
@@ -138,13 +128,7 @@ public class CliParser {
             return Optional.ofNullable(flightCode);
         }
 
-        public void setServerAddress(String serverAddress){
-            var matcher = SERVER_ADDRESS_PATTERN.matcher(serverAddress);
-            if (matcher.matches()){
-                host = matcher.group("host");
-                port = Integer.parseInt(matcher.group("port"));
-            }
-        }
+
     }
 
 

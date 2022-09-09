@@ -21,5 +21,4 @@ public class Seat implements Serializable {
         this.column = column;
     }
 
-
 }

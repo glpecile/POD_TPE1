@@ -20,12 +20,12 @@ public class CliParserTests {
     }
 
     @ParameterizedTest()
-    @ValueSource(strings = {"","1..1.1:9999","11.11.11.11","11.123.11.11:9999","hola","11.11.11.11:98900",
+    @ValueSource(strings = {"","1..1.1:9999","11.11.11.11","11.1234.11.11:9999","hola","11.11.11.11:98900",
             "11:99","11.11:999","11.11.11.11:10.10"
     })
     public void invalidServerAddress_ShouldFail(String serverAddress){
         // Arrange
-        var args = new String[]{"-DserverAddress=" + serverAddress, "-Daction=flights"};
+        var args = new String[]{"-DserverAddress=" + serverAddress, "-Daction=reticketing"};
 
         // Act
         var cli = cliParser.parse(args);
