@@ -2,6 +2,9 @@ package ar.edu.itba.pod.services;
 
 import ar.edu.itba.pod.interfaces.PassengerNotifier;
 
-public interface NotificationService {
-    void registerPassenger(String flightCode, String passenger, PassengerNotifier remote);
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface NotificationService extends Remote {
+    void registerPassenger(String flightCode, String passenger, PassengerNotifier remote) throws RemoteException;
 }

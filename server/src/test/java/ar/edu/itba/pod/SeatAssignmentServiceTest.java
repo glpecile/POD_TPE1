@@ -1,6 +1,7 @@
 package ar.edu.itba.pod;
 
 import ar.edu.itba.pod.models.*;
+import ar.edu.itba.pod.server.notifications.EventsManagerImpl;
 import ar.edu.itba.pod.server.services.SeatAssignmentService;
 import ar.edu.itba.pod.utils.Pair;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -58,7 +59,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -86,7 +87,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.CONFIRMED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 //        Act
         try {
             seatAssignmentService.assignSeat("FC1234", "test-name", 1, 'a');
@@ -113,7 +114,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.CANCELLED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 //        Act
         try {
             seatAssignmentService.assignSeat("FC1234", "test-name", 1, 'a');
@@ -140,7 +141,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 //        Act
         try {
             seatAssignmentService.assignSeat("FC1234", "", 1, 'a');
@@ -167,7 +168,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 //        Act
         try {
             seatAssignmentService.assignSeat("FC1234", "different-name", 1, 'a');
@@ -195,7 +196,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 //        Act
         try {
             seatAssignmentService.assignSeat("FC1234", "test-name", 1, 'b');
@@ -225,7 +226,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 //        Act
         try {
             seatAssignmentService.assignSeat("FC1234", "test-name", 1, 'a');
@@ -252,7 +253,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -280,7 +281,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -308,7 +309,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -336,7 +337,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -364,7 +365,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -392,7 +393,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -421,7 +422,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -450,7 +451,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -478,7 +479,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -507,7 +508,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -535,7 +536,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -563,7 +564,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -594,7 +595,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -625,7 +626,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -654,7 +655,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -684,7 +685,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -717,7 +718,7 @@ public class SeatAssignmentServiceTest {
         List<Flight> flights = new ArrayList<>();
         Flight flight = new Flight(FlightStatus.SCHEDULED, "AC1234", "FC1234", plane, tickets);
         flights.add(flight);
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -754,7 +755,7 @@ public class SeatAssignmentServiceTest {
         flights.add(flight2);
 
 
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {
@@ -791,7 +792,7 @@ public class SeatAssignmentServiceTest {
         flights.add(flight2);
 
 
-        seatAssignmentService = new SeatAssignmentService(flights);
+        seatAssignmentService = new SeatAssignmentService(flights, new EventsManagerImpl());
 
 //        Act
         try {

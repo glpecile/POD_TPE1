@@ -59,7 +59,7 @@ public class Plane implements Serializable {
         return modelName.equals(plane.modelName);
     }
 
-    public static class RowDescription {
+    public static class RowDescription implements Serializable {
         @Getter
         private final int row;
         @Getter

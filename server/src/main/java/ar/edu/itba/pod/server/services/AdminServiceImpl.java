@@ -2,6 +2,7 @@ package ar.edu.itba.pod.server.services;
 
 import ar.edu.itba.pod.exceptions.*;
 import ar.edu.itba.pod.models.*;
+import ar.edu.itba.pod.server.notifications.EventsManagerImpl;
 import ar.edu.itba.pod.services.AdminService;
 import ar.edu.itba.pod.utils.Pair;
 
@@ -16,10 +17,12 @@ public class AdminServiceImpl implements AdminService {
 
     private final List<Plane> planes;
     private final List<Flight> flights;
+    private final EventsManagerImpl eventsManager;
 
-    public AdminServiceImpl(List<Plane> planes, List<Flight> flights) {
+    public AdminServiceImpl(List<Plane> planes, List<Flight> flights, EventsManagerImpl eventsManager) {
         this.planes = planes;
         this.flights = flights;
+        this.eventsManager = eventsManager;
     }
 
     @Override
@@ -50,20 +53,23 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void confirmFlight(String flightCode) throws RemoteException {
-        setFlightStatus(flightCode, FlightStatus.CONFIRMED);
+        Flight flight = setFlightStatus(flightCode, FlightStatus.CONFIRMED);
+        this.eventsManager.notifyFlightConfirmation(flight);
     }
 
     @Override
     public void cancelFlight(String flightCode) throws RemoteException {
-        setFlightStatus(flightCode, FlightStatus.CANCELLED);
+        Flight flight = setFlightStatus(flightCode, FlightStatus.CANCELLED);
+        this.eventsManager.notifyFlightCancellation(flight);
     }
 
-    private void setFlightStatus(String flightCode, FlightStatus status) {
+    private Flight setFlightStatus(String flightCode, FlightStatus status) {
         Flight flight = this.flights.stream().filter(f -> f.getFlightCode().equals(flightCode)).findFirst().orElseThrow(FlightCodeNotExistException::new);
         if (!flight.getStatus().equals(FlightStatus.SCHEDULED)) {
             throw new FlightStatusNotPendingException();
         }
         flight.setStatus(status);
+        return flight;
     }
 
     @Override
@@ -89,6 +95,11 @@ public class AdminServiceImpl implements AdminService {
                 flight.getTickets().add(ticket);
                 pair.getFirst().getTickets().remove(ticket);
                 successfulTickets.add(pair);
+                try {
+                    eventsManager.notifyFlightChange(pair.getFirst(), flight, ticket.getPassengerName());
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 

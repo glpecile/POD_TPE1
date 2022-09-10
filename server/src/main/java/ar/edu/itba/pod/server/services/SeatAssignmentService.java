@@ -2,17 +2,21 @@ package ar.edu.itba.pod.server.services;
 
 import ar.edu.itba.pod.models.*;
 import ar.edu.itba.pod.server.exceptions.*;
+import ar.edu.itba.pod.server.notifications.EventsManager;
 
 import java.util.List;
 import java.util.Optional;
 
 public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssignmentService {
 
-    List<Flight> flightList;
+    private final List<Flight> flightList;
+    private final EventsManager eventsManager;
 
-    public SeatAssignmentService(List<Flight> flightList) {
+    public SeatAssignmentService(List<Flight> flightList, EventsManager eventsManager) {
         this.flightList = flightList;
+        this.eventsManager = eventsManager;
     }
+
     private Ticket validatePassenger(String passenger, Flight flight) throws Exception{
         if(passenger.isEmpty())
             throw new InvalidPassengerException();
@@ -82,7 +86,7 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
             throw new SeatCategoryIsToHighException();
 
         ticket.setSeatLocation(new Ticket.SeatLocation(row, column));
-
+        eventsManager.notifySeatAssignment(flight, ticket);
     }
 
     @Override
@@ -107,8 +111,10 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
         if(ticketOnLocation.isPresent())
             throw new SeatAlreadyAssignedException();
 
+        Ticket.SeatLocation oldSeatLocation = new Ticket.SeatLocation(ticket.getSeatLocation().get().getRow(), ticket.getSeatLocation().get().getColumn());
+        SeatCategory oldSeatCategory = flight.getPlane().getRows().get(oldSeatLocation.getRow()-1).getCategory();
         ticket.setSeatLocation(new Ticket.SeatLocation(row, column));
-
+        eventsManager.notifySeatChange(flight, oldSeatLocation, oldSeatCategory, ticket);
     }
 
 

@@ -43,7 +43,7 @@ public class Ticket implements Serializable {
         return Objects.hash(seatLocation, passengerName, seatCategory);
     }
 
-    public static class SeatLocation {
+    public static class SeatLocation implements Serializable {
         @Getter
         private final int row;
         @Getter

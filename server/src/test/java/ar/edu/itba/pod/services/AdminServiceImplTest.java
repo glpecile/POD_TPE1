@@ -2,6 +2,7 @@ package ar.edu.itba.pod.services;
 
 import ar.edu.itba.pod.exceptions.*;
 import ar.edu.itba.pod.models.*;
+import ar.edu.itba.pod.server.notifications.EventsManagerImpl;
 import ar.edu.itba.pod.server.services.AdminServiceImpl;
 import ar.edu.itba.pod.utils.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,7 @@ public class AdminServiceImplTest {
     public void setUp() {
         this.planes = new ArrayList<>();
         this.flights = new ArrayList<>();
-        this.adminService = new AdminServiceImpl(planes, flights);
+        this.adminService = new AdminServiceImpl(planes, flights, new EventsManagerImpl());
 
         String planeModelName = "Boeing 787";
         TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory = new TreeMap<>();

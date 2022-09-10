@@ -3,6 +3,7 @@ package ar.edu.itba.pod.models.criteria;
 import ar.edu.itba.pod.models.SeatRow;
 import ar.edu.itba.pod.models.criteria.Criteria;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 

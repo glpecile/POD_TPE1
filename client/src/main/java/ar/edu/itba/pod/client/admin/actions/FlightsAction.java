@@ -75,7 +75,7 @@ public class FlightsAction implements Runnable {
 
             for (var ticket: tickets.split(",")) {
                 var data = ticket.split("#");
-                Tickets.add(new Ticket(data[1], SeatCategory.valueOf(data[0]), 1, 'a'));
+                Tickets.add(new Ticket(data[1], SeatCategory.valueOf(data[0])));
             }
         }
 

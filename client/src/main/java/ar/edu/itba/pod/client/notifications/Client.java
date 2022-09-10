@@ -39,7 +39,7 @@ public class Client {
         } catch (RemoteException e) {
             logger.error("Cannot connect to server");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage());
         }
     }
 }
