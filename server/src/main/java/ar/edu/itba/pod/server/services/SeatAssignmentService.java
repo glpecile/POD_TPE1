@@ -1,8 +1,7 @@
-package ar.edu.itba.pod.server;
+package ar.edu.itba.pod.server.services;
 
 import ar.edu.itba.pod.models.*;
 import ar.edu.itba.pod.server.exceptions.*;
-import ar.edu.itba.pod.utils.Pair;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,10 +16,9 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
     private Ticket validatePassenger(String passenger, Flight flight) throws Exception{
         if(passenger.isEmpty())
             throw new InvalidPassengerException();
-        Ticket ticket = flight.getTickets().stream()
+        return flight.getTickets().stream()
                 .filter(t -> t.getPassengerName().equals(passenger))
                 .findAny().orElseThrow(InvalidPassengerException::new);
-        return ticket;
     }
     private Plane validateSeatLocation(int row, char column, Flight flight) throws Exception{
         if(row <= 0 || !Character.isLetter(column))
@@ -41,23 +39,21 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
 
         if(flight.getStatus() == FlightStatus.CONFIRMED)
             throw new FlightIsConfirmedException();
-
-        if(flight.getStatus() == FlightStatus.CANCELLED)
-            throw new FlightIsCancelledException();
         return flight;
     }
     private Optional<Ticket> ticketOnSeatLocation(Flight flight, int row, char column){
         Ticket.SeatLocation seatLocation = new Ticket.SeatLocation(row, column);
-        Optional<Ticket> ticketOnLocation = flight.getTickets().stream()
+        return flight.getTickets().stream()
                 .filter(t -> t.getSeatLocation().isPresent() && t.getSeatLocation().get().equals(seatLocation))
                 .findAny();
-        return ticketOnLocation;
     }
 
     @Override
     public Boolean isSeatTaken(String flightCode, int row, char column) throws Exception {
 
         Flight flight = validateFlight(flightCode);
+        if(flight.getStatus() == FlightStatus.CANCELLED)
+            throw new FlightIsCancelledException();
         validateSeatLocation(row, column, flight);
 
         Optional<Ticket> ticketOnLocation = ticketOnSeatLocation(flight, row, column);
@@ -68,6 +64,8 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
     public void assignSeat(String flightCode, String passenger, int row, char column) throws Exception {
 
         Flight flight = validateFlight(flightCode);
+        if(flight.getStatus() == FlightStatus.CANCELLED)
+            throw new FlightIsCancelledException();
         Plane plane = validateSeatLocation(row, column, flight);
         Ticket ticket = validatePassenger(passenger, flight);
 
@@ -91,6 +89,8 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
     public void changeSeat(String flightCode, String passenger, int row, char column) throws Exception{
 
         Flight flight = validateFlight(flightCode);
+        if(flight.getStatus() == FlightStatus.CANCELLED)
+            throw new FlightIsCancelledException();
         validateSeatLocation(row, column, flight);
         Ticket ticket = validatePassenger(passenger, flight);
 
@@ -113,12 +113,29 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
 
 
     @Override
-    public List<Flight> getAlternativeFlights(String flightCode, String passenger) {
-        return null;
+    public List<Flight> getAlternativeFlights(String flightCode, String passenger) throws Exception {
+        Flight flight = validateFlight(flightCode);
+        Ticket ticket = validatePassenger(passenger, flight);
+        return AlternativeFlights.getAlternativeFlights(flightList, ticket , flight);
     }
 
     @Override
-    public void changeTicket(String passenger, String flightCode, String newFlightCode) {
+    public void changeTicket(String passenger, String flightCode, String newFlightCode) throws Exception {
+        Flight oldFlight = validateFlight(flightCode);
+        List<Flight> alternativeFlights = getAlternativeFlights(flightCode, passenger);
+//        nueva excepcion
+        Flight newFlight = alternativeFlights.stream()
+                .findFirst()
+                .filter(f-> f.getFlightCode().equals(newFlightCode))
+                .orElseThrow(FlightDoesNotExistException::new);
+
+        validateFlight(newFlightCode);
+        Ticket ticket = validatePassenger(passenger, oldFlight);
+
+        ticket.setSeatLocation(null);
+
+        oldFlight.getTickets().remove(ticket);
+        newFlight.getTickets().add(ticket);
 
     }
 }
