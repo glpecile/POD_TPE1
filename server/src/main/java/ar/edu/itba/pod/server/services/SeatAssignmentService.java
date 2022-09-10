@@ -115,6 +115,8 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
     @Override
     public List<Flight> getAlternativeFlights(String flightCode, String passenger) throws Exception {
         Flight flight = validateFlight(flightCode);
+        if(flight.getStatus().equals(FlightStatus.CONFIRMED))
+            throw new FlightIsConfirmedException();
         Ticket ticket = validatePassenger(passenger, flight);
         return AlternativeFlights.getAlternativeFlights(flightList, ticket , flight);
     }
