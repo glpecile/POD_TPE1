@@ -1,6 +1,7 @@
 package ar.edu.itba.pod.client.seatmap.actions;
 
 import ar.edu.itba.pod.client.seatmap.CliParser;
+import ar.edu.itba.pod.exceptions.FlightDoesNotExistException;
 import ar.edu.itba.pod.services.SeatMapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,9 @@ public class SeatMapAction implements Runnable{
             seatRows.forEach( s -> printWriter.println(s.toString()));
             printWriter.close();
             logger.info("Seat map exported...");
+        }
+        catch(FlightDoesNotExistException e){
+            logger.error(e.toString());
         }
         catch (RemoteException e) {
             logger.error("Cannot request seat map for flight {}", flightCode);

@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Client: SeatMap" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="ar.edu.itba.pod.client.seatmap.Client" />
+    <module name="tpe1-g3-parent-client" />
+    <option name="PROGRAM_PARAMETERS" value="-DserverAddress=localhost:1099 -Dflight=AA100 -DoutPath=./resources/output.csv" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="ar.edu.itba.pod.client.admin.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

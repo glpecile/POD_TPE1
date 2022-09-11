@@ -2,6 +2,7 @@ package ar.edu.itba.pod.client.seatmap;
 
 
 import ar.edu.itba.pod.client.seatmap.actions.SeatMapAction;
+import ar.edu.itba.pod.exceptions.FlightDoesNotExistException;
 import ar.edu.itba.pod.services.SeatMapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public class Client {
         } catch (RemoteException e) {
             logger.error("Cannot connect to server");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage());
         }
     }
 
