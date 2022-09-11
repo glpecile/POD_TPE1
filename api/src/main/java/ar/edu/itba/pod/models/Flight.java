@@ -24,9 +24,7 @@ public class Flight implements Serializable {
         this.tickets = Collections.synchronizedList(tickets);
     }
 
-    public SeatCategory getMaxCategoryAvailable(Ticket ticket) {
-        SeatCategory maxCategory = ticket.getSeatCategory();
-
+    public SeatCategory getMaxCategoryAvailable(SeatCategory maxCategory) {
         Map<SeatCategory, Integer> seats = new TreeMap<>();
         for (SeatCategory category : SeatCategory.values()) {
             if (category.compareTo(maxCategory) >= 0) {
@@ -48,7 +46,7 @@ public class Flight implements Serializable {
         return null;
     }
 
-    public int getFreeSeats(SeatCategory maxCategory) {
+    public int getFreeSeatsInMaxCategory(SeatCategory maxCategory) {
         int freeSeats = 0;
         for (SeatCategory category : SeatCategory.values()) {
             if (category.compareTo(maxCategory) >= 0) {
@@ -60,6 +58,24 @@ public class Flight implements Serializable {
             freeSeats -= tickets.stream()
                     .filter(t -> t.getSeatLocation().isPresent())
                     .filter(t -> t.getSeatCategory().compareTo(maxCategory) >= 0)
+                    .count();
+        }
+
+        return freeSeats;
+    }
+
+    public int getFreeSeatsInCategory(SeatCategory category) {
+        int freeSeats = 0;
+        for (SeatCategory c : SeatCategory.values()) {
+            if (c.compareTo(category) == 0) {
+                freeSeats += plane.getSeatsDistribution().get(c);
+            }
+        }
+
+        synchronized (tickets) {
+            freeSeats -= tickets.stream()
+                    .filter(t -> t.getSeatLocation().isPresent())
+                    .filter(t -> t.getSeatCategory().compareTo(category) == 0)
                     .count();
         }
 

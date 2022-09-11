@@ -4,6 +4,7 @@ import ar.edu.itba.pod.models.*;
 import ar.edu.itba.pod.server.exceptions.*;
 import ar.edu.itba.pod.server.notifications.EventsManager;
 
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +62,7 @@ public class SeatAssignmentServiceImpl implements ar.edu.itba.pod.services.SeatA
     }
 
     @Override
-    public Boolean isSeatTaken(String flightCode, int row, char column) {
+    public Boolean isSeatTaken(String flightCode, int row, char column) throws RemoteException {
         Flight flight = validateFlight(flightCode);
 
         if (flight.isStatus(FlightStatus.CANCELLED))
@@ -74,7 +75,7 @@ public class SeatAssignmentServiceImpl implements ar.edu.itba.pod.services.SeatA
     }
 
     @Override
-    public void assignSeat(String flightCode, String passenger, int row, char column) throws Exception {
+    public void assignSeat(String flightCode, String passenger, int row, char column) throws RemoteException {
         Flight flight = validateFlight(flightCode);
 
         if (flight.isStatus(FlightStatus.CANCELLED))
@@ -101,7 +102,7 @@ public class SeatAssignmentServiceImpl implements ar.edu.itba.pod.services.SeatA
     }
 
     @Override
-    public void changeSeat(String flightCode, String passenger, int row, char column) throws Exception {
+    public void changeSeat(String flightCode, String passenger, int row, char column) throws RemoteException {
         Flight flight = validateFlight(flightCode);
 
         if (flight.isStatus(FlightStatus.CANCELLED))
@@ -127,7 +128,7 @@ public class SeatAssignmentServiceImpl implements ar.edu.itba.pod.services.SeatA
     }
 
     @Override
-    public List<Flight> getAlternativeFlights(String flightCode, String passenger) {
+    public List<AlternativeFlight> getAlternativeFlights(String flightCode, String passenger) throws RemoteException {
         Flight flight = validateFlight(flightCode);
 
         if (flight.isStatus(FlightStatus.CONFIRMED))
@@ -136,18 +137,27 @@ public class SeatAssignmentServiceImpl implements ar.edu.itba.pod.services.SeatA
         Ticket ticket = validatePassenger(passenger, flight);
 
         synchronized (flights.values()) {
-            return AlternativeFlights.getAlternativeFlights(flights.values(), ticket, flight);
+            SeatCategory seatCategory = flight.getMaxCategoryAvailable(ticket.getSeatCategory());
+            return AlternativeFlight.getAlternativeFlights(flights.values(), ticket, flight).stream()
+                    .map(f -> new AlternativeFlight(f, seatCategory, f.getFreeSeatsInCategory(seatCategory)))
+                    .toList();
         }
     }
 
     @Override
-    public void changeTicket(String passenger, String flightCode, String newFlightCode) {
+    public void changeTicket(String passenger, String flightCode, String newFlightCode) throws RemoteException {
         Flight oldFlight = validateFlight(flightCode);
-        List<Flight> alternativeFlights = getAlternativeFlights(flightCode, passenger);
+        List<AlternativeFlight> alternativeFlights = null;
+        try {
+            alternativeFlights = getAlternativeFlights(flightCode, passenger);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
 
         // nueva excepcion
         Flight newFlight = alternativeFlights.stream()
-                .filter(f -> f.getFlightCode().equals(newFlightCode))
+                .map(AlternativeFlight::getFlight)
+                .filter(flight -> flight.getFlightCode().equals(newFlightCode))
                 .findFirst()
                 .orElseThrow(FlightDoesNotExistException::new);
 
