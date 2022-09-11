@@ -23,7 +23,10 @@ public class SeatRow implements Serializable {
 
     @Override
     public String toString() {
-        var seatsStrings = Arrays.stream(seats).filter(Objects::nonNull).map(Seat::toString).collect(Collectors.toList());
-        return seatsStrings.stream().collect(Collectors.joining("|", "| ", " | " + category.toString())) ;
+        var seatsStrings = Arrays.stream(seats)
+                .filter(Objects::nonNull).map(Seat::toString)
+                .map(s -> String.format(" %02d %s", row, s))
+                .collect(Collectors.toList());
+        return seatsStrings.stream().collect(Collectors.joining("|", "|", "|" + String.format("    %s", category.toString())));
     }
 }

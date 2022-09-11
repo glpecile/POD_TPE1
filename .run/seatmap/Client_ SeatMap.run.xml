@@ -2,7 +2,8 @@
   <configuration default="false" name="Client: SeatMap" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="ar.edu.itba.pod.client.seatmap.Client" />
     <module name="tpe1-g3-parent-client" />
-    <option name="PROGRAM_PARAMETERS" value="-DserverAddress=localhost:1099 -Dflight=AA100 -DoutPath=./resources/output.csv" />
+    <option name="PROGRAM_PARAMETERS" value="-DserverAddress=localhost:1099 -Dflight=AA101 -DoutPath=./resources/output.csv" />
+    <projectPathOnTarget name="projectPathOnTarget" value="/mnt/c/Program Files/JetBrains/IntelliJ IDEA 2021.3.2/jbr/bin /TPE1-POD-G3" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="ar.edu.itba.pod.client.admin.*" />
