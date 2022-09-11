@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ar.edu.itba.pod</groupId>
-    <artifactId>tpe1-g3-parent-parent</artifactId>
+    <artifactId>tpe1-g3-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>tpe1-g3-parent-parent</name>
+    <name>tpe1-g3-parent</name>
 
     <modules>
         <module>api</module>

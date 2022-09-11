@@ -4,15 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>tpe1-g3-parent-parent</artifactId>
+        <artifactId>tpe1-g3-parent</artifactId>
         <groupId>ar.edu.itba.pod</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>tpe1-g3-parent-api</artifactId>
+    <artifactId>tpe1-g3-api</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>tpe1-g3-parent-api</name>
+    <name>tpe1-g3-api</name>
 
     <dependencies>
         <dependency>

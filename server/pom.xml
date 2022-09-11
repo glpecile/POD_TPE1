@@ -5,20 +5,20 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>tpe1-g3-parent-parent</artifactId>
+        <artifactId>tpe1-g3-parent</artifactId>
         <groupId>ar.edu.itba.pod</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>tpe1-g3-parent-server</artifactId>
+    <artifactId>tpe1-g3-server</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>tpe1-g3-parent-server</name>
+    <name>tpe1-g3-server</name>
 
     <dependencies>
         <dependency>
             <groupId>ar.edu.itba.pod</groupId>
-            <artifactId>tpe1-g3-parent-api</artifactId>
+            <artifactId>tpe1-g3-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
