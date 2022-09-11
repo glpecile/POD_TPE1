@@ -1,7 +1,6 @@
 package ar.edu.itba.pod.client.admin;
 
 import ar.edu.itba.pod.client.admin.actions.ActionType;
-import ar.edu.itba.pod.client.models.Arguments;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.cli.*;
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 public class CliParser {
 
@@ -18,7 +16,6 @@ public class CliParser {
     private final CommandLineParser parser = new DefaultParser();
 
     private final Options options = new Options();
-
 
     public Optional<Arguments> parse(String[] args) {
         try {
@@ -29,11 +26,11 @@ public class CliParser {
         }
     }
 
-    public CliParser(){
-        options.addRequiredOption("DserverAddress","DserverAddress",true,"RMI Server address");
-        options.addRequiredOption("Daction","Daction",true,"Action to perform");
-        options.addOption(new Option("DinPath","DinPath",true,"Input file path"))
-                .addOption(new Option("Dflight","Dflight",true,"Flight code"));
+    public CliParser() {
+        options.addRequiredOption("DserverAddress", "DserverAddress", true, "RMI Server address");
+        options.addRequiredOption("Daction", "Daction", true, "Action to perform");
+        options.addOption(new Option("DinPath", "DinPath", true, "Input file path"))
+                .addOption(new Option("Dflight", "Dflight", true, "Flight code"));
 
     }
 
@@ -52,7 +49,7 @@ public class CliParser {
         }
 
         // Check action and other parameters
-        switch (args.getAction()){
+        switch (args.getAction()) {
             case MODELS:
             case FLIGHTS:
                 if (cmd.hasOption("DinPath"))
@@ -90,12 +87,12 @@ public class CliParser {
         private String flightCode = null;
 
         @Override
-        public boolean isValid(){
+        public boolean isValid() {
             if (!super.isValid())
                 return false;
 
             var filePath = getFilePath();
-            if (filePath.isPresent()){
+            if (filePath.isPresent()) {
 
                 var file = new File(filePath.get());
 
@@ -104,7 +101,7 @@ public class CliParser {
                     return false;
                 }
 
-                if (!file.exists()){
+                if (!file.exists()) {
                     logger.error("The file does not exist!");
                     return false;
                 }
@@ -112,7 +109,7 @@ public class CliParser {
 
             var flightCode = getFlightCode();
 
-            if (flightCode.isPresent() && flightCode.get().isEmpty()){
+            if (flightCode.isPresent() && flightCode.get().isEmpty()) {
                 logger.error("The flight code is not valid!");
                 return false;
             }
@@ -128,8 +125,6 @@ public class CliParser {
             return Optional.ofNullable(flightCode);
         }
 
-
     }
-
 
 }

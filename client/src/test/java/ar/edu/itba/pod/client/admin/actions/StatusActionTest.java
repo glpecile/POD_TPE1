@@ -44,6 +44,6 @@ public class StatusActionTest {
         new StatusAction(adminService, arguments, logger).run();
 
         // Assert
-        verify(logger).error("Cannot get status of flight {}",flightCode);
+        verify(logger).error("Cannot get status of flight {}", flightCode);
     }
 }
