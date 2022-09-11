@@ -21,4 +21,14 @@ public class Seat implements Serializable {
         this.column = column;
     }
 
+    private String printPassenger(){
+        if(passenger != null)
+            return passenger.charAt(0) + "";
+        return " * ";
+    }
+
+    @Override
+    public String toString() {
+        return column + " " + printPassenger() + " ";
+    }
 }
