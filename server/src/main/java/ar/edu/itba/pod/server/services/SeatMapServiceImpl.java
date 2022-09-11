@@ -10,10 +10,10 @@ import java.util.*;
 
 public class SeatMapServiceImpl implements SeatMapService {
 
-    private final List<Flight> flights;
+    private final Map<String, Flight> flights;
 
 
-    public SeatMapServiceImpl(List<Flight> flights) {
+    public SeatMapServiceImpl(Map<String, Flight> flights) {
         this.flights = flights;
     }
 
@@ -29,7 +29,7 @@ public class SeatMapServiceImpl implements SeatMapService {
     public List<SeatRow> getSeatMap(String flightCode, Criteria criteria) throws RemoteException {
 
         //Primero encontrar el vuelo segun el string dado.
-        Flight flight = flights.stream().filter(f -> f.getFlightCode().equals(flightCode)).findFirst().orElseThrow(FlightDoesNotExistException::new);
+        Flight flight = Optional.ofNullable(flights.get(flightCode)).orElseThrow(FlightDoesNotExistException::new);
 
         //Filtrar dentro de los asientos de acuerdo al criterio recibido.
 

@@ -5,15 +5,16 @@ import ar.edu.itba.pod.server.exceptions.*;
 import ar.edu.itba.pod.server.notifications.EventsManager;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssignmentService {
+public class SeatAssignmentServiceImpl implements ar.edu.itba.pod.services.SeatAssignmentService {
 
-    private final List<Flight> flightList;
+    private final Map<String, Flight> flights;
     private final EventsManager eventsManager;
 
-    public SeatAssignmentService(List<Flight> flightList, EventsManager eventsManager) {
-        this.flightList = flightList;
+    public SeatAssignmentServiceImpl(Map<String, Flight> flights, EventsManager eventsManager) {
+        this.flights = flights;
         this.eventsManager = eventsManager;
     }
 
@@ -37,9 +38,7 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
         if(flightCode.isEmpty())
             throw new FlightDoesNotExistException();
 
-        Flight flight = flightList.stream()
-                .filter(f -> f.getFlightCode().equals(flightCode))
-                .findFirst().orElseThrow(FlightDoesNotExistException::new);
+        Flight flight = Optional.ofNullable(flights.get(flightCode)).orElseThrow(FlightDoesNotExistException::new);
 
         if(flight.getStatus() == FlightStatus.CONFIRMED)
             throw new FlightIsConfirmedException();
@@ -124,7 +123,7 @@ public class SeatAssignmentService implements ar.edu.itba.pod.services.SeatAssig
         if(flight.getStatus().equals(FlightStatus.CONFIRMED))
             throw new FlightIsConfirmedException();
         Ticket ticket = validatePassenger(passenger, flight);
-        return AlternativeFlights.getAlternativeFlights(flightList, ticket , flight);
+        return AlternativeFlights.getAlternativeFlights(flights.values().stream().toList(), ticket , flight);
     }
 
     @Override

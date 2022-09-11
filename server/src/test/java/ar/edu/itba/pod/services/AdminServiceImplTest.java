@@ -9,23 +9,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AdminServiceImplTest {
 
-    private List<Plane> planes;
-    private List<Flight> flights;
+    private Map<String, Plane> planes;
+    private Map<String, Flight> flights;
     private AdminService adminService;
 
     @BeforeEach
     public void setUp() {
-        this.planes = new ArrayList<>();
-        this.flights = new ArrayList<>();
+        this.planes = Collections.synchronizedMap(new HashMap<>());
+        this.flights = Collections.synchronizedMap(new HashMap<>());
         this.adminService = new AdminServiceImpl(planes, flights, new EventsManagerImpl());
 
         String planeModelName = "Boeing 787";
@@ -34,13 +31,12 @@ public class AdminServiceImplTest {
         seatsPerCategory.put(SeatCategory.PREMIUM_ECONOMY, new Pair<>(2, 2));
         seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(2, 2));
         Plane plane = new Plane(planeModelName, seatsPerCategory);
-        this.planes.add(plane);
+        this.planes.put(planeModelName, plane);
 
         String flightCode = "AR1235";
         String airportCode = "EZE";
         Flight flight = new Flight(FlightStatus.SCHEDULED, airportCode, flightCode, plane, new ArrayList<>());
-        this.flights.add(flight);
-
+        this.flights.put(flightCode, flight);
     }
 
     @Test
@@ -54,7 +50,7 @@ public class AdminServiceImplTest {
         adminService.addPlane(planeModelName, seatsPerCategory);
 
         assertEquals(planes.size(), 2);
-        assertEquals(planes.get(1).getModelName(), planeModelName);
+        assertEquals(planes.get(planeModelName).getModelName(), planeModelName);
     }
 
     @Test
@@ -77,7 +73,7 @@ public class AdminServiceImplTest {
         adminService.addFlight(planeModelName, flightCode, airportCode, new ArrayList<>());
 
         assertEquals(flights.size(), 2);
-        assertEquals(flights.get(1).getFlightCode(), flightCode);
+        assertEquals(flights.get(flightCode).getFlightCode(), flightCode);
     }
 
     @Test
@@ -124,8 +120,8 @@ public class AdminServiceImplTest {
     @Test
     public void confirmFlightWithNoFlightTest() {
         String flightCode = "AR1236";
-        Flight confirmedFlight = new Flight(FlightStatus.CONFIRMED, "EZE", flightCode, planes.get(0), new ArrayList<>());
-        flights.add(confirmedFlight);
+        Flight confirmedFlight = new Flight(FlightStatus.CONFIRMED, "EZE", flightCode, planes.values().stream().toList().get(0), new ArrayList<>());
+        flights.put(flightCode, confirmedFlight);
 
         assertThrows(FlightStatusNotPendingException.class, () -> adminService.confirmFlight(flightCode));
     }
@@ -142,8 +138,8 @@ public class AdminServiceImplTest {
     @Test
     public void cancelFlightWithNoFlightTest() {
         String flightCode = "AR1236";
-        Flight cancelledFlight = new Flight(FlightStatus.CANCELLED, "EZE", flightCode, planes.get(0), new ArrayList<>());
-        flights.add(cancelledFlight);
+        Flight cancelledFlight = new Flight(FlightStatus.CANCELLED, "EZE", flightCode, planes.values().stream().toList().get(0), new ArrayList<>());
+        flights.put(flightCode, cancelledFlight);
 
         assertThrows(FlightStatusNotPendingException.class, () -> adminService.cancelFlight(flightCode));
     }
@@ -152,28 +148,28 @@ public class AdminServiceImplTest {
     void rescheduleTickets_RescheduleSingleTicketOnSameCategory_ShouldSucceed() throws RemoteException {
         // Arrange
         String planeModelName = "Boeing 787";
-        var plane = planes.stream().filter(p -> p.getModelName().equals(planeModelName)).findFirst().orElseThrow();
+        var plane = planes.get(planeModelName);
 
         String cancelledFlightCode = "CAN123";
         String newFlightCode = "NEW123";
         String airportCode = "EZE";
 
         var tickets = new ArrayList<Ticket>();
-        tickets.add(new Ticket("Carlos",SeatCategory.ECONOMY, 5,'a'));
+        tickets.add(new Ticket("Carlos", SeatCategory.ECONOMY, 5, 'a'));
 
         this.flights.clear();
-        this.flights.add(new Flight(FlightStatus.CANCELLED, airportCode, cancelledFlightCode, plane, tickets));
-        this.flights.add(new Flight(FlightStatus.SCHEDULED, airportCode, newFlightCode, plane, new ArrayList<>()));
+        this.flights.put(cancelledFlightCode, new Flight(FlightStatus.CANCELLED, airportCode, cancelledFlightCode, plane, tickets));
+        this.flights.put(newFlightCode, new Flight(FlightStatus.SCHEDULED, airportCode, newFlightCode, plane, new ArrayList<>()));
 
         try {
             // Act
             var report = adminService.rescheduleTickets();
 
             // Assert
-            assertEquals(List.of(),report.getFailure());
-            assertEquals(1,report.getSuccess());
-            assertEquals(1,flights.stream().filter(f -> f.getFlightCode().equals(newFlightCode)).findFirst().orElseThrow().getTickets().size());
-            assertEquals(0,flights.stream().filter(f -> f.getFlightCode().equals(cancelledFlightCode)).findFirst().orElseThrow().getTickets().size());
+            assertEquals(List.of(), report.getFailure());
+            assertEquals(1, report.getSuccess());
+            assertEquals(1, flights.get(newFlightCode).getTickets().size());
+            assertEquals(0, flights.get(cancelledFlightCode).getTickets().size());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -183,27 +179,27 @@ public class AdminServiceImplTest {
     void rescheduleTickets_NoAlternativeFlights_ShouldFail() {
         // Arrange
         String planeModelName = "Boeing 787";
-        var plane = planes.stream().filter(p -> p.getModelName().equals(planeModelName)).findFirst().orElseThrow();
+        var plane = planes.get(planeModelName);
 
         String cancelledFlightCode = "CAN123";
         String newFlightCode = "NEW123";
 
         var tickets = new ArrayList<Ticket>();
-        tickets.add(new Ticket("Carlos",SeatCategory.ECONOMY, 5,'a'));
+        tickets.add(new Ticket("Carlos", SeatCategory.ECONOMY, 5, 'a'));
 
         this.flights.clear();
-        this.flights.add(new Flight(FlightStatus.CANCELLED, "JFK", cancelledFlightCode, plane, tickets));
-        this.flights.add(new Flight(FlightStatus.SCHEDULED, "EE", newFlightCode, plane, new ArrayList<>()));
+        this.flights.put(cancelledFlightCode, new Flight(FlightStatus.CANCELLED, "JFK", cancelledFlightCode, plane, tickets));
+        this.flights.put(newFlightCode ,new Flight(FlightStatus.SCHEDULED, "EE", newFlightCode, plane, new ArrayList<>()));
 
         try {
             // Act
             var report = adminService.rescheduleTickets();
 
             // Assert
-            assertEquals(1,report.getFailure().size());
-            assertEquals(0,report.getSuccess());
-            assertEquals(1,flights.stream().filter(f -> f.getFlightCode().equals(cancelledFlightCode)).findFirst().orElseThrow().getTickets().size());
-            assertEquals(0,flights.stream().filter(f -> f.getFlightCode().equals(newFlightCode)).findFirst().orElseThrow().getTickets().size());
+            assertEquals(1, report.getFailure().size());
+            assertEquals(0, report.getSuccess());
+            assertEquals(1, flights.get(cancelledFlightCode).getTickets().size());
+            assertEquals(0, flights.get(newFlightCode).getTickets().size());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -212,44 +208,49 @@ public class AdminServiceImplTest {
     @Test
     void rescheduleTickets_RescheduleSingleTicketOnDifferentCategory_ShouldSucceed() throws RemoteException {
         // Arrange
-        var privateJet = new Plane("Private Jet",new TreeMap<>(Map.of(SeatCategory.BUSINESS, new Pair<>(1, 1))));
-        var cheapPlane = new Plane("Private Jet",new TreeMap<>(Map.of(SeatCategory.ECONOMY, new Pair<>(1, 1))));
-        planes.addAll(List.of(privateJet,cheapPlane));
+        var privateJet = new Plane("Private Jet 1", new TreeMap<>(Map.of(SeatCategory.BUSINESS, new Pair<>(1, 1))));
+        var cheapPlane = new Plane("Private Jet 2", new TreeMap<>(Map.of(SeatCategory.ECONOMY, new Pair<>(1, 1))));
+        planes.put("Private Jet 1", privateJet);
+        planes.put("Private Jet 2", cheapPlane);
 
         var tickets = new ArrayList<Ticket>();
         tickets.add(new Ticket("Carlos", SeatCategory.BUSINESS, 1, 'a'));
 
         this.flights.clear();
-        this.flights.add(new Flight(FlightStatus.CANCELLED, "EZE", "CAN123", privateJet, tickets));
-        this.flights.add(new Flight(FlightStatus.SCHEDULED, "EZE","NEW123" , cheapPlane, new ArrayList<>()));
+        String cancelledFlightCode = "CAN123";
+        String newFlightCode = "NEW123";
+        this.flights.put(cancelledFlightCode, new Flight(FlightStatus.CANCELLED, "EZE", cancelledFlightCode, privateJet, tickets));
+        this.flights.put(newFlightCode ,new Flight(FlightStatus.SCHEDULED, "EZE", newFlightCode, cheapPlane, new ArrayList<>()));
 
         try {
             // Act
             var report = adminService.rescheduleTickets();
 
             // Assert
-            assertEquals(List.of(),report.getFailure());
-            assertEquals(1,report.getSuccess());
-            assertEquals(1,flights.stream().filter(f -> f.getFlightCode().equals("NEW123")).findFirst().orElseThrow().getTickets().size());
-            assertEquals(0,flights.stream().filter(f -> f.getFlightCode().equals("CAN123")).findFirst().orElseThrow().getTickets().size());
+            assertEquals(List.of(), report.getFailure());
+            assertEquals(1, report.getSuccess());
+            assertEquals(1, flights.get(newFlightCode).getTickets().size());
+            assertEquals(0, flights.get(cancelledFlightCode).getTickets().size());
         } catch (Exception e) {
             fail(e.getMessage());
         }
     }
 
     @Test
-    void rescheduleTickets_FlightExistsButNoTicketsOnSimilarCategory_ShouldFail(){
+    void rescheduleTickets_FlightExistsButNoTicketsOnSimilarCategory_ShouldFail() {
         // Arrange
-        var privateJet = new Plane("Private Jet",new TreeMap<>(Map.of(SeatCategory.BUSINESS, new Pair<>(1, 1))));
-        var cheapPlane = planes.stream().filter(p -> p.getModelName().equals("Boeing 787")).findFirst().orElseThrow();
-        planes.add(privateJet);
+        var privateJet = new Plane("Private Jet", new TreeMap<>(Map.of(SeatCategory.BUSINESS, new Pair<>(1, 1))));
+        var cheapPlane = planes.get("Boeing 787");
+        planes.put("Private Jet" ,privateJet);
 
         var tickets = new ArrayList<Ticket>();
         tickets.add(new Ticket("Carlos", SeatCategory.ECONOMY, 5, 'a'));
 
         this.flights.clear();
-        this.flights.add(new Flight(FlightStatus.CANCELLED, "EZE", "AR111", cheapPlane, tickets));
-        this.flights.add(new Flight(FlightStatus.SCHEDULED, "EZE", "EX123", privateJet, new ArrayList<>()));
+        String ar111 = "AR111";
+        String ex123 = "EX123";
+        this.flights.put(ar111, new Flight(FlightStatus.CANCELLED, "EZE", ar111, cheapPlane, tickets));
+        this.flights.put(ex123, new Flight(FlightStatus.SCHEDULED, "EZE", ex123, privateJet, new ArrayList<>()));
 
         // Act
         try {
@@ -258,48 +259,52 @@ public class AdminServiceImplTest {
             // Assert
             assertEquals(1, report.getFailure().size());
             assertEquals(0, report.getSuccess());
-            assertEquals(1, flights.stream().filter(f -> f.getFlightCode().equals("AR111")).findFirst().orElseThrow().getTickets().size());
-            assertEquals(0, flights.stream().filter(f -> f.getFlightCode().equals("EX123")).findFirst().orElseThrow().getTickets().size());
+            assertEquals(1, flights.get(ar111).getTickets().size());
+            assertEquals(0, flights.get(ex123).getTickets().size());
         } catch (Exception e) {
             fail(e.getMessage());
         }
     }
 
     @Test
-    void rescheduleTickets_MultipleTickets_ShouldSucceed(){
+    void rescheduleTickets_MultipleTickets_ShouldSucceed() {
         // Arrange
-        var privateJet = new Plane("Private Jet",new TreeMap<>(Map.of(SeatCategory.BUSINESS, new Pair<>(1, 2))));
-        planes.add(privateJet);
+        var privateJet = new Plane("Private Jet", new TreeMap<>(Map.of(SeatCategory.BUSINESS, new Pair<>(1, 2))));
+        planes.put("Private Jet", privateJet);
 
         var tickets = new ArrayList<Ticket>();
         tickets.add(new Ticket("Carlos", SeatCategory.BUSINESS, 1, 'a'));
         tickets.add(new Ticket("Carlos Segundo", SeatCategory.BUSINESS, 1, 'b'));
 
         this.flights.clear();
-        this.flights.add(new Flight(FlightStatus.CANCELLED, "EZE", "AR111", privateJet, tickets));
-        this.flights.add(new Flight(FlightStatus.SCHEDULED, "EZE", "EX123", privateJet, new ArrayList<>()));
+        String ar111 = "AR111";
+        String ex123 = "EX123";
+        this.flights.put(ar111, new Flight(FlightStatus.CANCELLED, "EZE", ar111, privateJet, tickets));
+        this.flights.put(ex123, new Flight(FlightStatus.SCHEDULED, "EZE", ex123, privateJet, new ArrayList<>()));
 
-        try{
+        try {
             // act
             var report = adminService.rescheduleTickets();
 
             // Assert
             assertEquals(0, report.getFailure().size());
             assertEquals(2, report.getSuccess());
-            assertEquals(2, flights.stream().filter(f -> f.getFlightCode().equals("EX123")).findFirst().orElseThrow().getTickets().size());
-            assertEquals(0, flights.stream().filter(f -> f.getFlightCode().equals("AR111")).findFirst().orElseThrow().getTickets().size());
+            assertEquals(2, flights.get(ex123).getTickets().size());
+            assertEquals(0, flights.get(ar111).getTickets().size());
         } catch (Exception e) {
             fail(e.getMessage());
         }
     }
 
     @Test
-    void rescheduleTickets_MultipleTickets_ShouldPreferBusinessSucceed(){
+    void rescheduleTickets_MultipleTickets_ShouldPreferBusinessSucceed() {
         // Arrange
-        var privateJet = new Plane("Private Jet",new TreeMap<>(Map.of(SeatCategory.BUSINESS, new Pair<>(1, 2))));
-        planes.add(privateJet);
-        var cheapJet = new Plane("Cheap Jet",new TreeMap<>(Map.of(SeatCategory.PREMIUM_ECONOMY, new Pair<>(1, 2))));
-        planes.add(cheapJet);
+        String privateJetModelName = "Private Jet";
+        String cheapJetModelName = "Cheap Jet";
+        var privateJet = new Plane(privateJetModelName, new TreeMap<>(Map.of(SeatCategory.BUSINESS, new Pair<>(1, 2))));
+        planes.put(privateJetModelName ,privateJet);
+        var cheapJet = new Plane(cheapJetModelName, new TreeMap<>(Map.of(SeatCategory.PREMIUM_ECONOMY, new Pair<>(1, 2))));
+        planes.put(cheapJetModelName, cheapJet);
 
         var cancelledTickets = new ArrayList<Ticket>();
         cancelledTickets.add(new Ticket("Carlos", SeatCategory.BUSINESS, 1, 'a'));
@@ -309,30 +314,34 @@ public class AdminServiceImplTest {
 //        scheduledTickets.add(new Ticket("Carla", SeatCategory.BUSINESS, 1, 'a'));
 
         this.flights.clear();
-        this.flights.add(new Flight(FlightStatus.CANCELLED, "EZE", "AR111", privateJet, cancelledTickets));
-        this.flights.add(new Flight(FlightStatus.SCHEDULED, "EZE", "EX123", privateJet, new ArrayList<>()));
-        this.flights.add(new Flight(FlightStatus.SCHEDULED, "EZE", "EX124", cheapJet, new ArrayList<>()));
+        String ar111 = "AR111";
+        String ex123 = "EX123";
+        String ex124 = "EX124";
+        this.flights.put(ar111, new Flight(FlightStatus.CANCELLED, "EZE", ar111, privateJet, cancelledTickets));
+        this.flights.put(ex123, new Flight(FlightStatus.SCHEDULED, "EZE", ex123, privateJet, new ArrayList<>()));
+        this.flights.put(ex124, new Flight(FlightStatus.SCHEDULED, "EZE", ex124, cheapJet, new ArrayList<>()));
 
-        try{
+        try {
             // act
             var report = adminService.rescheduleTickets();
 
             // Assert
             assertEquals(0, report.getFailure().size());
             assertEquals(2, report.getSuccess());
-            assertEquals(2, flights.stream().filter(f -> f.getFlightCode().equals("EX123")).findFirst().orElseThrow().getTickets().size());
-            assertEquals(0, flights.stream().filter(f -> f.getFlightCode().equals("EX124")).findFirst().orElseThrow().getTickets().size());
-            assertEquals(0, flights.stream().filter(f -> f.getFlightCode().equals("AR111")).findFirst().orElseThrow().getTickets().size());
+            assertEquals(2, flights.get(ex123).getTickets().size());
+            assertEquals(0, flights.get(ex124).getTickets().size());
+            assertEquals(0, flights.get(ar111).getTickets().size());
         } catch (Exception e) {
             fail(e.getMessage());
         }
     }
 
     @Test
-    void rescheduleTickets_MultipleTicketsWithoutSpots_ShouldFail(){
+    void rescheduleTickets_MultipleTicketsWithoutSpots_ShouldFail() {
         // Arrange
-        var privateJet = new Plane("Private Jet",new TreeMap<>(Map.of(SeatCategory.BUSINESS, new Pair<>(1, 2))));
-        planes.add(privateJet);
+        String privateJetModelName = "Private Jet";
+        var privateJet = new Plane(privateJetModelName, new TreeMap<>(Map.of(SeatCategory.BUSINESS, new Pair<>(1, 2))));
+        planes.put(privateJetModelName, privateJet);
 
         var cancelledTickets = new ArrayList<Ticket>();
         cancelledTickets.add(new Ticket("Carlos", SeatCategory.BUSINESS, 1, 'a'));
@@ -342,22 +351,22 @@ public class AdminServiceImplTest {
         scheduledTickets.add(new Ticket("Carla", SeatCategory.BUSINESS, 1, 'a'));
 
         this.flights.clear();
-        this.flights.add(new Flight(FlightStatus.CANCELLED, "EZE", "AR111", privateJet, cancelledTickets));
-        this.flights.add(new Flight(FlightStatus.SCHEDULED, "JFK", "EX123", privateJet, new ArrayList<>()));
+        String ar111 = "AR111";
+        String ex123 = "EX123";
+        this.flights.put(ar111, new Flight(FlightStatus.CANCELLED, "EZE", ar111, privateJet, cancelledTickets));
+        this.flights.put(ex123, new Flight(FlightStatus.SCHEDULED, "JFK", ex123, privateJet, new ArrayList<>()));
 
-        try{
+        try {
             // act
             var report = adminService.rescheduleTickets();
 
             // Assert
             assertEquals(2, report.getFailure().size());
             assertEquals(0, report.getSuccess());
-            assertEquals(0, flights.stream().filter(f -> f.getFlightCode().equals("EX123")).findFirst().orElseThrow().getTickets().size());
-            assertEquals(2, flights.stream().filter(f -> f.getFlightCode().equals("AR111")).findFirst().orElseThrow().getTickets().size());
+            assertEquals(0, flights.get(ex123).getTickets().size());
+            assertEquals(2, flights.get(ar111).getTickets().size());
         } catch (Exception e) {
             fail(e.getMessage());
         }
     }
-
-
 }

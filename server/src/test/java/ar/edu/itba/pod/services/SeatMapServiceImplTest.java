@@ -11,24 +11,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SeatMapServiceImplTest {
 
-    private List<Plane> planes;
-    private List<Flight> flights;
+    private Map<String, Plane> planes;
+    private Map<String, Flight> flights;
     private SeatMapService seatMapService;
     private List<Ticket> tickets;
 
     @BeforeEach
     public void setUp(){
-        this.flights = new ArrayList<>();
+        this.flights = new HashMap<>();
         this.seatMapService = new SeatMapServiceImpl(flights);
-        this.planes = new ArrayList<>();
+        this.planes = new HashMap<>();
         this.tickets = new ArrayList<>();
 
         String planeModelName = "Boeing 787";
@@ -37,13 +35,13 @@ public class SeatMapServiceImplTest {
         seatsPerCategory.put(SeatCategory.PREMIUM_ECONOMY, new Pair<>(2, 2));
         seatsPerCategory.put(SeatCategory.ECONOMY, new Pair<>(2, 2));
         Plane plane = new Plane(planeModelName, seatsPerCategory);
-        this.planes.add(plane);
+        this.planes.put(planeModelName, plane);
 
 
         String flightCode = "AR1235";
         String airportCode = "EZE";
         Flight flight = new Flight(FlightStatus.SCHEDULED, airportCode, flightCode, plane, tickets);
-        this.flights.add(flight);
+        this.flights.put(flightCode, flight);
 
     }
 
@@ -57,7 +55,7 @@ public class SeatMapServiceImplTest {
         juanTicket.setSeatLocation(new Ticket.SeatLocation(row,col));
         this.tickets.add(juanTicket);
 
-        var result = seatMapService.getSeatMap(flights.get(0).getFlightCode(),criteria);
+        var result = seatMapService.getSeatMap(flights.values().stream().toList().get(0).getFlightCode(),criteria);
 
         assertEquals(passenger,result.get(0).getSeats()[col - 'A'].getPassenger());
 
@@ -73,7 +71,7 @@ public class SeatMapServiceImplTest {
         juanTicket.setSeatLocation(new Ticket.SeatLocation(row,col));
         this.tickets.add(juanTicket);
 
-        var result = seatMapService.getSeatMap(flights.get(0).getFlightCode(),criteria);
+        var result = seatMapService.getSeatMap(flights.values().stream().toList().get(0).getFlightCode(),criteria);
 
         assertEquals(passenger,result.get(0).getSeats()[col - 'A'].getPassenger());
     }
@@ -89,7 +87,7 @@ public class SeatMapServiceImplTest {
         juanTicket.setSeatLocation(new Ticket.SeatLocation(row,col));
         this.tickets.add(juanTicket);
 
-        var result = seatMapService.getSeatMap(flights.get(0).getFlightCode(),criteria);
+        var result = seatMapService.getSeatMap(flights.values().stream().toList().get(0).getFlightCode(),criteria);
 
         assertEquals(passenger,result.get(0).getSeats()[col - 'A'].getPassenger());
 

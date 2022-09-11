@@ -7,19 +7,16 @@ import ar.edu.itba.pod.services.AdminService;
 import ar.edu.itba.pod.utils.Pair;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AdminServiceImpl implements AdminService {
 
-    private final List<Plane> planes;
-    private final List<Flight> flights;
+    private final Map<String, Plane> planes;
+    private final Map<String, Flight> flights;
     private final EventsManagerImpl eventsManager;
 
-    public AdminServiceImpl(List<Plane> planes, List<Flight> flights, EventsManagerImpl eventsManager) {
+    public AdminServiceImpl(Map<String, Plane> planes, Map<String, Flight> flights, EventsManagerImpl eventsManager) {
         this.planes = planes;
         this.flights = flights;
         this.eventsManager = eventsManager;
@@ -27,27 +24,27 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void addPlane(String planeModelName, TreeMap<SeatCategory, Pair<Integer, Integer>> seatsPerCategory) throws RemoteException {
-        if (planes.stream().anyMatch(plane -> plane.getModelName().equals(planeModelName))) {
+        if (planes.containsKey(planeModelName)) {
             throw new PlaneModelAlreadyExistsException();
         }
         final Plane plane = new Plane(planeModelName, seatsPerCategory);
-        planes.add(plane);
+        planes.put(planeModelName, plane);
     }
 
     @Override
     public void addFlight(String planeModelName, String flightCode, String airportCode, List<Ticket> tickets) throws RemoteException {
-        if (flights.stream().anyMatch(flight -> flight.getFlightCode().equals(flightCode))) {
+        if (flights.containsKey(flightCode)) {
             throw new FlightCodeAlreadyExistsException();
         }
 
-        Plane plane = planes.stream().filter(p -> p.getModelName().equals(planeModelName)).findFirst().orElseThrow(PlaneModelNotExistException::new);
+        Plane plane = Optional.ofNullable(planes.get(planeModelName)).orElseThrow(PlaneModelNotExistException::new);
         Flight flight = new Flight(FlightStatus.SCHEDULED, airportCode, flightCode, plane, tickets);
-        flights.add(flight);
+        flights.put(flightCode, flight);
     }
 
     @Override
     public FlightStatus getFlightStatus(String flightCode) throws RemoteException {
-        Flight flight = this.flights.stream().filter(f -> f.getFlightCode().equals(flightCode)).findFirst().orElseThrow(FlightCodeNotExistException::new);
+        Flight flight = Optional.ofNullable(flights.get(flightCode)).orElseThrow(FlightCodeNotExistException::new);
         return flight.getStatus();
     }
 
@@ -64,7 +61,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private Flight setFlightStatus(String flightCode, FlightStatus status) {
-        Flight flight = this.flights.stream().filter(f -> f.getFlightCode().equals(flightCode)).findFirst().orElseThrow(FlightCodeNotExistException::new);
+        Flight flight = Optional.ofNullable(flights.get(flightCode)).orElseThrow(FlightCodeNotExistException::new);
         if (!flight.getStatus().equals(FlightStatus.SCHEDULED)) {
             throw new FlightStatusNotPendingException();
         }
@@ -74,13 +71,13 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public ReticketingReport rescheduleTickets() throws RemoteException {
-        final List<Pair<Flight, Ticket>> tickets = this.flights.stream()
+        final List<Pair<Flight, Ticket>> tickets = this.flights.values().stream()
                 .filter(f -> f.getStatus().equals(FlightStatus.CANCELLED))
                 .sorted(Comparator.comparing(Flight::getFlightCode))
                 .flatMap(f -> f.getTickets().stream()
                         .sorted(Comparator.comparing(Ticket::getPassengerName))
                         .map(t -> new Pair<>(f, t)))
-                .collect(Collectors.toList());
+                .toList();
 
         List<Pair<Flight, Ticket>> successfulTickets = new ArrayList<>();
         List<Pair<Flight, Ticket>> failedTickets = new ArrayList<>();
@@ -110,7 +107,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private List<Flight> getAlternativeFlights(Ticket ticket, Flight flight) {
-        return AlternativeFlights.getAlternativeFlights(flights, ticket, flight);
+        return AlternativeFlights.getAlternativeFlights(flights.values().stream().toList(), ticket, flight);
 
     }
 }
