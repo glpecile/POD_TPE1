@@ -687,15 +687,14 @@ public class SeatAssignmentServiceTest {
         flights.put(flightCode, flight);
         seatAssignmentService = new SeatAssignmentServiceImpl(flights, new EventsManagerImpl());
 
-//        Act
+        // Act
         try {
             seatAssignmentService.changeSeat("FC1234", "test-name", 4, 'b');
 
-//            Assert
+            // Assert
 
         } catch (Exception e) {
-            fail();
-
+            fail(e.getMessage());
         }
     }
 

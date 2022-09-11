@@ -1,14 +1,12 @@
 package ar.edu.itba.pod.models;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 
 public class Ticket implements Serializable {
-    @Setter
     private SeatLocation seatLocation;
     @Getter
     private final String passengerName;
@@ -26,8 +24,12 @@ public class Ticket implements Serializable {
         this.seatLocation = new SeatLocation(i,a);
     }
 
-    public Optional<SeatLocation> getSeatLocation() {
+    public synchronized Optional<SeatLocation> getSeatLocation() {
         return Optional.ofNullable(seatLocation);
+    }
+
+    public synchronized void setSeatLocation(SeatLocation seatLocation) {
+        this.seatLocation = seatLocation;
     }
 
     @Override
@@ -52,6 +54,11 @@ public class Ticket implements Serializable {
         public SeatLocation(int row, char column) {
             this.row = row;
             this.column = column;
+        }
+
+        public SeatLocation(Ticket.SeatLocation o) {
+            this.row = o.row;
+            this.column = o.column;
         }
 
         @Override

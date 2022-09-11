@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 public class PassengerNotifierImpl implements PassengerNotifier {
 
@@ -53,5 +54,6 @@ public class PassengerNotifierImpl implements PassengerNotifier {
     public void notifyFlightConfirmation(String flightCode, String destination, Ticket.SeatLocation seat, SeatCategory category) throws RemoteException {
         String seatString = seat == null ? "" : String.format(" and your seat %s %s", category, seat);
         logger.info("Your Flight {} with destination {} was confirmed{}.", flightCode, destination, seatString);
+        UnicastRemoteObject.unexportObject(this,true);
     }
 }

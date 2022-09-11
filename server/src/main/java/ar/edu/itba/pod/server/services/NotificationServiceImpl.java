@@ -24,7 +24,11 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void registerPassenger(String flightCode, String passenger, PassengerNotifier remote) throws RemoteException {
         Flight flight = Optional.ofNullable(flights.get(flightCode)).orElseThrow(FlightCodeNotExistException::new);
-        flight.getTickets().stream().filter(t -> t.getPassengerName().equals(passenger)).findFirst().orElseThrow(PassengerNotExistException::new);
+        synchronized (flight.getTickets()) {
+            flight.getTickets().stream()
+                    .filter(t -> t.getPassengerName().equals(passenger))
+                    .findFirst().orElseThrow(PassengerNotExistException::new);
+        }
         eventsManager.addPassengerSubscriber(passenger, flightCode, flight.getAirportCode(), remote);
     }
 }

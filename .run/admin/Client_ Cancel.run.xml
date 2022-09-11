@@ -2,7 +2,7 @@
   <configuration default="false" name="Client: Cancel" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="ar.edu.itba.pod.client.admin.Client" />
     <module name="tpe1-g3-parent-client" />
-    <option name="PROGRAM_PARAMETERS" value="-DserverAddress=localhost:1099 -Daction=cancel -Dflight=AA101" />
+    <option name="PROGRAM_PARAMETERS" value="-DserverAddress=localhost:1099 -Daction=cancel -Dflight=AA100" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="ar.edu.itba.pod.client.admin.*" />

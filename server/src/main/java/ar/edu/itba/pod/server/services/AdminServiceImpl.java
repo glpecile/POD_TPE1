@@ -62,40 +62,73 @@ public class AdminServiceImpl implements AdminService {
 
     private Flight setFlightStatus(String flightCode, FlightStatus status) {
         Flight flight = Optional.ofNullable(flights.get(flightCode)).orElseThrow(FlightCodeNotExistException::new);
-        if (!flight.getStatus().equals(FlightStatus.SCHEDULED)) {
-            throw new FlightStatusNotPendingException();
+
+        synchronized (flights.get(flightCode)) {
+            if (!flight.isStatus(FlightStatus.SCHEDULED)) {
+                throw new FlightStatusNotPendingException();
+            }
+            flight.setStatus(status);
         }
-        flight.setStatus(status);
+
         return flight;
     }
 
     @Override
     public ReticketingReport rescheduleTickets() throws RemoteException {
-        final List<Pair<Flight, Ticket>> tickets = this.flights.values().stream()
-                .filter(f -> f.getStatus().equals(FlightStatus.CANCELLED))
-                .sorted(Comparator.comparing(Flight::getFlightCode))
-                .flatMap(f -> f.getTickets().stream()
-                        .sorted(Comparator.comparing(Ticket::getPassengerName))
-                        .map(t -> new Pair<>(f, t)))
-                .toList();
+        List<Pair<Flight, Ticket>> ticketsToReschedule;
+         synchronized (flights) {
+             ticketsToReschedule = this.flights.values().stream()
+                    .filter(f -> f.isStatus(FlightStatus.CANCELLED))
+                    .sorted(Comparator.comparing(Flight::getFlightCode))
+                    .flatMap(f -> {
+                        // TODO: Review
+                        //          A                B
+                        //                          f = flights.get()
+                        //       sync(flights)
+                        //                          sync(f.tickets)
+                        // f' == f
+                        //       sync(f'.tickets)
+                        //                          sync(flights)
+                        synchronized (f.getTickets()) {
+                            return f.getTickets().stream()
+                                .sorted(Comparator.comparing(Ticket::getPassengerName))
+                                .map(t -> new Pair<>(f, t));
+                        }
+                    })
+                    .toList();
+        }
 
         List<Pair<Flight, Ticket>> successfulTickets = new ArrayList<>();
         List<Pair<Flight, Ticket>> failedTickets = new ArrayList<>();
-        tickets.forEach(pair -> {
+
+        //          A                           B
+        //      f in getAlt()
+        //                                   f.cancel()
+        //      f.AddTicket(t)
+
+        //          A                           B
+        //      f in getAlt()
+        //      f.AddTicket(t)
+        //                                   f.cancel()
+
+        ticketsToReschedule.forEach(pair -> {
             List<Flight> alternativeFlights = getAlternativeFlights(pair.getSecond(), pair.getFirst());
             if (alternativeFlights.isEmpty()) {
                 failedTickets.add(pair);
             } else {
-                Flight flight = alternativeFlights.get(0);
-                Ticket ticket = pair.getSecond();
-                ticket.setSeatLocation(null);
-                flight.getTickets().add(ticket);
-                pair.getFirst().getTickets().remove(ticket);
-                successfulTickets.add(pair);
-                try {
-                    eventsManager.notifyFlightChange(pair.getFirst(), flight, ticket.getPassengerName());
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
+                synchronized (alternativeFlights.get(0)) {
+                    Flight flight = alternativeFlights.get(0);
+                    Ticket ticket = pair.getSecond();
+                    ticket.setSeatLocation(null);
+                    flight.getTickets().add(ticket);
+                    pair.getFirst().getTickets().remove(ticket);
+                    successfulTickets.add(pair);
+
+                    try {
+                        eventsManager.notifyFlightChange(pair.getFirst(), flight, ticket.getPassengerName());
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         });
@@ -103,11 +136,13 @@ public class AdminServiceImpl implements AdminService {
         return new ReticketingReport(successfulTickets.size(),
                 failedTickets.stream()
                         .map(pair -> new ReticketingReport.FailureTicket(pair.getSecond().getPassengerName(), pair.getFirst().getFlightCode()))
-                        .collect(Collectors.toList()));
+                        .toList());
     }
 
     private List<Flight> getAlternativeFlights(Ticket ticket, Flight flight) {
-        return AlternativeFlights.getAlternativeFlights(flights.values().stream().toList(), ticket, flight);
-
+        // TODO: Review
+        synchronized (flights) {
+            return AlternativeFlights.getAlternativeFlights(flights.values(), ticket, flight);
+        }
     }
 }
