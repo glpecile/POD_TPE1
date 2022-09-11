@@ -113,10 +113,11 @@ public class SeatAssignmentServiceImpl implements ar.edu.itba.pod.services.SeatA
         Ticket ticket = validatePassenger(passenger, flight);
 
         synchronized (flights.get(flightCode)) {
-            Ticket.SeatLocation oldSeatLocation =  new Ticket.SeatLocation(ticket.getSeatLocation()
+            Ticket.SeatLocation oldSeatLocation = new Ticket.SeatLocation(ticket.getSeatLocation()
                     .orElseThrow(PassengerNotAssignedException::new)
             );
-            SeatCategory oldSeatCategory = flight.getPlane().getRows().get(oldSeatLocation.getRow() - 1).getCategory();;
+            SeatCategory oldSeatCategory = flight.getPlane().getRows().get(oldSeatLocation.getRow() - 1).getCategory();
+            ;
             Optional<Ticket> ticketOnLocation = ticketOnSeatLocation(flight, row, column);
 
             if (ticketOnLocation.isPresent() && !oldSeatLocation.equals(new Ticket.SeatLocation(row, column)))
@@ -137,9 +138,8 @@ public class SeatAssignmentServiceImpl implements ar.edu.itba.pod.services.SeatA
         Ticket ticket = validatePassenger(passenger, flight);
 
         synchronized (flights.values()) {
-            SeatCategory seatCategory = flight.getMaxCategoryAvailable(ticket.getSeatCategory());
             return AlternativeFlight.getAlternativeFlights(flights.values(), ticket, flight).stream()
-                    .map(f -> new AlternativeFlight(f, seatCategory, f.getFreeSeatsInCategory(seatCategory)))
+                    .map(f -> new AlternativeFlight(f, f.getMaxCategoryAvailable(ticket.getSeatCategory()), f.getFreeSeatsInCategory(f.getMaxCategoryAvailable(ticket.getSeatCategory()))))
                     .toList();
         }
     }
@@ -167,5 +167,6 @@ public class SeatAssignmentServiceImpl implements ar.edu.itba.pod.services.SeatA
         ticket.setSeatLocation(null);
         oldFlight.getTickets().remove(ticket);
         newFlight.getTickets().add(ticket);
+        eventsManager.notifyFlightChange(oldFlight, newFlight, passenger);
     }
 }
