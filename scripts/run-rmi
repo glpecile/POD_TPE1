@@ -1,0 +1,5 @@
+#!/bin/bash
+
+CLASSPATH=".:../api/target/tpe1-g3-api-1.0-SNAPSHOT.jar"
+export CLASSPATH
+rmiregistry -J-Djava.rmi.server.logCalls=true  "$@"

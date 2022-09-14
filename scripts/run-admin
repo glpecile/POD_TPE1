@@ -1,0 +1,4 @@
+#!/bin/bash
+
+tar -xf "../client/target/tpe1-g3-client-1.0-SNAPSHOT-bin.tar.gz" -C "../client/target/"
+java -cp '../client/target/tpe1-g3-client-1.0-SNAPSHOT/lib/jars/*'  "ar.edu.itba.pod.client.admin.Client" "$@"
