@@ -9,6 +9,8 @@ import ar.edu.itba.pod.utils.Pair;
 import java.rmi.RemoteException;
 import java.util.*;
 
+import static java.util.stream.Collectors.toList;
+
 public class AdminServiceImpl implements AdminService {
 
     private final Map<String, Plane> planes;
@@ -141,7 +143,10 @@ public class AdminServiceImpl implements AdminService {
     private List<Flight> getAlternativeFlights(Ticket ticket, Flight flight) {
         // TODO: Review
         synchronized (flights) {
-            return AlternativeFlight.getAlternativeFlights(flights.values(), ticket, flight);
+            return AlternativeFlight.getAlternativeFlights(flights.values(), ticket, flight)
+                    .stream()
+                    .map(AlternativeFlight::getFlight)
+                    .toList();
         }
     }
 }

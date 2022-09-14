@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AlternativeFlight implements Serializable {
+public class AlternativeFlight implements Serializable, Comparable<AlternativeFlight> {
     @Getter
     private final Flight flight;
     @Getter
@@ -21,24 +21,25 @@ public class AlternativeFlight implements Serializable {
         this.freeSeats = freeSeats;
     }
 
-    public static List<Flight> getAlternativeFlights(Collection<Flight> flights, Ticket ticket, Flight flight) {
+    @Override
+    public int compareTo(AlternativeFlight other) {
+        if (!this.category.equals(other.category)) {
+            return this.category.compareTo(other.category); //we want the highest category (BUSINESS = 0)
+        }
+        if (this.freeSeats != other.freeSeats) {
+            return Integer.compare(other.freeSeats, this.freeSeats); //reversed because we want the most free seats
+        }
+        return this.flight.getFlightCode().compareTo(other.flight.getFlightCode());
+    }
+
+    public static List<AlternativeFlight> getAlternativeFlights(Collection<Flight> flights, Ticket ticket, Flight flight) {
             return flights.stream()
                     .filter(f -> f.getAirportCode().equals(flight.getAirportCode()))
                     .filter(f -> f.isStatus(FlightStatus.SCHEDULED))
-                    .filter(f -> f.getMaxCategoryAvailable(ticket.getSeatCategory()) != null)
                     .filter(f -> !f.equals(flight))
-                    .sorted((o1, o2) -> {
-                        if (o1.getMaxCategoryAvailable(ticket.getSeatCategory()) != o2.getMaxCategoryAvailable(ticket.getSeatCategory())) {
-                            return o1.getMaxCategoryAvailable(ticket.getSeatCategory()).ordinal() - o2.getMaxCategoryAvailable(ticket.getSeatCategory()).ordinal(); //we want the highest category (BUSINESS = 0)
-                        }
-                        if (o1.getFreeSeatsInMaxCategory(ticket.getSeatCategory()) != o2.getFreeSeatsInMaxCategory(ticket.getSeatCategory())) {
-                            return o2.getFreeSeatsInMaxCategory(ticket.getSeatCategory()) - o1.getFreeSeatsInMaxCategory(ticket.getSeatCategory()); //reversed because we want the most free seats
-                        }
-                        return o1.getFlightCode().compareTo(o2.getFlightCode());
-
-                    })
+                    .flatMap(f -> f.getAlternativeFlight(ticket).stream())
+                    .sorted()
                     .collect(Collectors.toList());
-
     }
 
 }

@@ -24,51 +24,11 @@ public class Flight implements Serializable {
         this.tickets = Collections.synchronizedList(tickets);
     }
 
-    public SeatCategory getMaxCategoryAvailable(SeatCategory maxCategory) {
-        Map<SeatCategory, Integer> seats = new TreeMap<>();
-        for (SeatCategory category : SeatCategory.values()) {
-            if (category.compareTo(maxCategory) >= 0) {
-                seats.put(category, plane.getSeatsDistribution().getOrDefault(category, 0));
-            }
-        }
-
-        synchronized (tickets) {
-            this.tickets.stream()
-                    .filter(t -> t.getSeatLocation().isPresent())
-                    .forEach(t -> seats.put(t.getSeatCategory(), seats.get(t.getSeatCategory()) - 1));
-        }
-
-        for (SeatCategory category : SeatCategory.values()) {
-            if (seats.getOrDefault(category, 0) > 0) {
-                return category;
-            }
-        }
-        return null;
-    }
-
-    public int getFreeSeatsInMaxCategory(SeatCategory maxCategory) {
-        int freeSeats = 0;
-        for (SeatCategory category : SeatCategory.values()) {
-            if (category.compareTo(maxCategory) >= 0) {
-                freeSeats += plane.getSeatsDistribution().get(category);
-            }
-        }
-
-        synchronized (tickets) {
-            freeSeats -= tickets.stream()
-                    .filter(t -> t.getSeatLocation().isPresent())
-                    .filter(t -> t.getSeatCategory().compareTo(maxCategory) >= 0)
-                    .count();
-        }
-
-        return freeSeats;
-    }
-
     public int getFreeSeatsInCategory(SeatCategory category) {
         int freeSeats = 0;
         for (SeatCategory c : SeatCategory.values()) {
             if (c.compareTo(category) == 0) {
-                freeSeats += plane.getSeatsDistribution().get(c);
+                freeSeats += plane.getSeatsDistribution().getOrDefault(c, 0);
             }
         }
 
@@ -80,6 +40,19 @@ public class Flight implements Serializable {
         }
 
         return freeSeats;
+    }
+
+    public List<AlternativeFlight> getAlternativeFlight(Ticket ticket) {
+        List<AlternativeFlight> alternatives = new ArrayList<>();
+        for (SeatCategory category : SeatCategory.values()) {
+            if (category.compareTo(ticket.getSeatCategory()) >= 0) {
+                int freeSeats = getFreeSeatsInCategory(category);
+                if (freeSeats > 0) {
+                    alternatives.add(new AlternativeFlight(this, category, freeSeats));
+                }
+            }
+        }
+        return alternatives;
     }
 
     public synchronized FlightStatus getStatus() {
