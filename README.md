@@ -114,3 +114,31 @@ A continuación se detallan los clientes y sus funcionalidades.
 | `-Dcol`       | \[OPCIONAL\] `char col`                                     | Letra de columna.                       |
 
 ------------------------------------------------------------------------
+
+
+# Correcciones
+
+## Destacado:
+
+* La claridad del informe, bien detalladas y justificadas las decisiones.
+* La cantidad y calidad de tests.
+* El diseño y uso de patrones a la hora de desarrollar tanto cliente como servidor.
+ 
+## Oportunidad de Mejora:
+
+* Cuidado con filtrar lógica del servidor en la api por ejemplo Flight, AlternativeFlight tienen lógica.
+* Flight.getFreeSeatsInCategory: El primer ciclo parece innecesario.
+* Es buena práctica notificar en un thread para no bloquear a quienes llaman al servicio esperando el retorno de los Handlers
+* `t.getSeatLocation().isPresent()` -> `ticket.isAssigned()` ?
+* changeTicket calcula todas las alternativas para luego buscar el vuelo pedido. Para no recorrer los vuelos se podría pedir el vuelo seleccionado y chequear si es alternativo directamente.
+ 
+
+## Errores:
+
+* En la mayoría de los métodos del servicio de asignación se chequea el estado del vuelo dos veces (diferentes estados), esto abre la posibilidad de que cambie entre chequeo y chequeo. 
+* AdminServiceImpl. addPlane tiene una condición de carrera entre que chequea que el modelo está en la colección y setea el nuevo. Una alternativa sería sincronizar el llamado a un put if absent y luego a partir de la respuesta ver si ya existía o si se insertó.
+* La acción “flights” no debe abortar cuando no se puede agregar uno de los vuelos del lote. Se pedía de imprimir una salida como “Cannot add flight” y “X flights added” y en su lugar se obtiene el stacktrace de una excepción PlaneModelNotExistException: The plane model does not exist. El catch que hace en ar.edu.itba.pod.client.admin.actions.FlightsAction#run captura RemoteException pero no PlaneModelNotExistException.
+* En cliente de consulta de mapa de asientos, se pedía que no se genere el CSV cuando no hay asientos que cumplen el criterio indicado, y en cambio genera un CSV vacío.
+* Ante un error en el cliente de notificaciones, el mismo debería finalizar su ejecución. El cliente se mantiene en ejecución porque quedó exportado. 
+* El cliente de notificaciones permite registrar a un pasajero para que sea notificado de un vuelo confirmado y no corresponde.
+* La acción “reticketing” imprime en salida el mensaje “Error while reticketing” y no corresponde. Si un ticket no se puede cambiar, se debe seguir intentando con los demás. Se pedía que se imprima la cantidad de tickets cambiados y se listen los que no se pudieron cambiar.
